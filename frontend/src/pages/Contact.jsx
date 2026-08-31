@@ -36,168 +36,107 @@ function Contact() {
 
   return (
     <div className="contact-page">
-
       {/* HERO */}
 
       <section className="contact-hero">
-
         <div className="contact-hero-content">
+          <span className="contact-badge">CARDWISE SUPPORT</span>
 
-          <span className="contact-badge">
-            CARDWISE SUPPORT
-          </span>
-
-          <h1>
-            How Can We Help You?
-          </h1>
+          <h1>How Can We Help You?</h1>
 
           <p>
-            Have questions about a credit card, eligibility,
-            benefits or your application? Contact the CardWise
-            administration team.
+            Have questions about a credit card, eligibility, benefits or your
+            application? Contact the CardWise administration team.
           </p>
-
         </div>
-
       </section>
 
       {/* CONTACT CONTENT */}
 
       <section className="contact-section">
-
         <div className="contact-container">
-
           {/* LEFT */}
 
           <div className="contact-information">
+            <span className="contact-label">GET IN TOUCH</span>
 
-            <span className="contact-label">
-              GET IN TOUCH
-            </span>
-
-            <h2>
-              We're Here to Help
-            </h2>
+            <h2>We're Here to Help</h2>
 
             <p>
-              If you need assistance with a credit card or
-              application, send us a message or contact the
-              CardWise team directly.
+              If you need assistance with a credit card or application, send us
+              a message or contact the CardWise team directly.
             </p>
 
             <div className="contact-methods">
-
               <div className="contact-method">
-
-                <div className="contact-method-icon">
-                  ✉
-                </div>
+                <div className="contact-method-icon">✉</div>
 
                 <div>
                   <span>Email</span>
                   <strong>support@cardwise.com</strong>
                 </div>
-
               </div>
 
               <div className="contact-method">
-
-                <div className="contact-method-icon">
-                  ☎
-                </div>
+                <div className="contact-method-icon">☎</div>
 
                 <div>
                   <span>Phone</span>
-                  <strong>+91 98765 43210</strong>
+                  <strong>+91 7235986172</strong>
                 </div>
-
               </div>
 
               <div className="contact-method">
-
-                <div className="contact-method-icon">
-                  🕐
-                </div>
+                <div className="contact-method-icon">🕐</div>
 
                 <div>
                   <span>Support Hours</span>
                   <strong>Monday – Saturday</strong>
                   <small>10:00 AM – 6:00 PM</small>
                 </div>
-
               </div>
-
             </div>
 
-            <Link
-              to="/cards"
-              className="contact-back-button"
-            >
+            <Link to="/cards" className="contact-back-button">
               ← Back to Credit Cards
             </Link>
-
           </div>
 
           {/* RIGHT */}
 
           <div className="contact-form-card">
-
             {submitted ? (
-
               <div className="contact-success">
+                <div className="contact-success-icon">✓</div>
 
-                <div className="contact-success-icon">
-                  ✓
-                </div>
-
-                <h2>
-                  Message Sent Successfully
-                </h2>
+                <h2>Message Sent Successfully</h2>
 
                 <p>
-                  Thank you for contacting CardWise.
-                  Our administration team will review
-                  your message and get back to you.
+                  Thank you for contacting CardWise. Our administration team
+                  will review your message and get back to you.
                 </p>
 
-                <button
-                  onClick={() => setSubmitted(false)}
-                >
+                <button onClick={() => setSubmitted(false)}>
                   Send Another Message
                 </button>
-
               </div>
-
             ) : (
-
               <>
-
                 <div className="contact-form-heading">
+                  <span>SEND A MESSAGE</span>
 
-                  <span>
-                    SEND A MESSAGE
-                  </span>
-
-                  <h2>
-                    Contact CardWise
-                  </h2>
+                  <h2>Contact CardWise</h2>
 
                   <p>
-                    Fill in the details below and send
-                    your message to our administration team.
+                    Fill in the details below and send your message to our
+                    administration team.
                   </p>
-
                 </div>
 
                 <form onSubmit={handleSubmit}>
-
                   <div className="contact-form-row">
-
                     <div className="contact-input-group">
-
-                      <label htmlFor="name">
-                        Your Name
-                      </label>
+                      <label htmlFor="name">Your Name</label>
 
                       <input
                         id="name"
@@ -208,14 +147,10 @@ function Contact() {
                         onChange={handleChange}
                         required
                       />
-
                     </div>
 
                     <div className="contact-input-group">
-
-                      <label htmlFor="email">
-                        Email Address
-                      </label>
+                      <label htmlFor="email">Email Address</label>
 
                       <input
                         id="email"
@@ -226,16 +161,11 @@ function Contact() {
                         onChange={handleChange}
                         required
                       />
-
                     </div>
-
                   </div>
 
                   <div className="contact-input-group">
-
-                    <label htmlFor="subject">
-                      Subject
-                    </label>
+                    <label htmlFor="subject">Subject</label>
 
                     <input
                       id="subject"
@@ -246,14 +176,10 @@ function Contact() {
                       onChange={handleChange}
                       required
                     />
-
                   </div>
 
                   <div className="contact-input-group">
-
-                    <label htmlFor="message">
-                      Message
-                    </label>
+                    <label htmlFor="message">Message</label>
 
                     <textarea
                       id="message"
@@ -264,28 +190,17 @@ function Contact() {
                       onChange={handleChange}
                       required
                     />
-
                   </div>
 
-                  <button
-                    type="submit"
-                    className="contact-submit-button"
-                  >
+                  <button type="submit" className="contact-submit-button">
                     Send Message →
                   </button>
-
                 </form>
-
               </>
-
             )}
-
           </div>
-
         </div>
-
       </section>
-
     </div>
   );
 }
