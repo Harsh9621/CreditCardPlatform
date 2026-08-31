@@ -1,5 +1,13 @@
-# Application secrets
+# Environment configuration
 src/main/resources/application.properties
 
-# Maven
+# Build
 target/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Logs
+*.log
