@@ -250,7 +250,11 @@ public class SecurityConfig {
 
         configuration.setAllowedOrigins(
                 List.of(
-                        "http://localhost:5173"
+                        // Local Vite development
+                        "http://localhost:5173",
+
+                        // Production Vercel frontend
+                        "https://credit-card-platform-boopzmv9k-coder-2451.vercel.app"
                 )
         );
 

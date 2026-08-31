@@ -1,1 +1,5 @@
+# Application secrets
+src/main/resources/application.properties
+
+# Maven
 target/
