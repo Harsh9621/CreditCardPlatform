@@ -1,25 +1,22 @@
 package com.cardwise.cardwise.security;
 
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import jakarta.servlet.http.HttpServletResponse;
-
-import java.util.List;
 
 @Configuration
 @EnableMethodSecurity
@@ -27,9 +24,7 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    public SecurityConfig(
-            JwtAuthenticationFilter jwtAuthenticationFilter) {
-
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
@@ -87,6 +82,15 @@ public class SecurityConfig {
                 // =================================================
 
                 .authorizeHttpRequests(auth -> auth
+
+                        // -------------------------------------------------
+                        // CORS PREFLIGHT REQUESTS
+                        // -------------------------------------------------
+
+                        .requestMatchers(
+                                HttpMethod.OPTIONS,
+                                "/**"
+                        ).permitAll()
 
                         // -------------------------------------------------
                         // PUBLIC ENDPOINTS
@@ -174,7 +178,7 @@ public class SecurityConfig {
                 )
 
                 // =================================================
-                // JWT FILTER
+                // JWT AUTHENTICATION FILTER
                 // =================================================
 
                 .addFilterBefore(
@@ -186,7 +190,7 @@ public class SecurityConfig {
     }
 
     // =====================================================
-    // 401 - AUTHENTICATION ENTRY POINT
+    // 401 - UNAUTHORIZED
     // =====================================================
 
     @Bean
@@ -202,6 +206,8 @@ public class SecurityConfig {
                     "application/json"
             );
 
+            response.setCharacterEncoding("UTF-8");
+
             response.getWriter().write(
                     "{\"message\":\"Authentication required\"}"
             );
@@ -209,7 +215,7 @@ public class SecurityConfig {
     }
 
     // =====================================================
-    // 403 - ACCESS DENIED
+    // 403 - FORBIDDEN
     // =====================================================
 
     @Bean
@@ -232,6 +238,8 @@ public class SecurityConfig {
                     "application/json"
             );
 
+            response.setCharacterEncoding("UTF-8");
+
             response.getWriter().write(
                     "{\"message\":\"Access denied. Administrator privileges required.\"}"
             );
@@ -248,15 +256,23 @@ public class SecurityConfig {
         CorsConfiguration configuration =
                 new CorsConfiguration();
 
+        // -------------------------------------------------
+        // ALLOWED FRONTENDS
+        // -------------------------------------------------
+
         configuration.setAllowedOrigins(
                 List.of(
-                        // Local Vite development
+                        // Local Vite frontend
                         "http://localhost:5173",
 
                         // Production Vercel frontend
-                        "https://credit-card-platform-boopzmv9k-coder-2451.vercel.app"
+                        "https://credit-card-platform-silk.vercel.app"
                 )
         );
+
+        // -------------------------------------------------
+        // ALLOWED HTTP METHODS
+        // -------------------------------------------------
 
         configuration.setAllowedMethods(
                 List.of(
@@ -269,6 +285,10 @@ public class SecurityConfig {
                 )
         );
 
+        // -------------------------------------------------
+        // ALLOWED HEADERS
+        // -------------------------------------------------
+
         configuration.setAllowedHeaders(
                 List.of(
                         "Authorization",
@@ -279,13 +299,25 @@ public class SecurityConfig {
                 )
         );
 
+        // -------------------------------------------------
+        // EXPOSED HEADERS
+        // -------------------------------------------------
+
         configuration.setExposedHeaders(
                 List.of(
                         "Authorization"
                 )
         );
 
+        // -------------------------------------------------
+        // CREDENTIALS
+        // -------------------------------------------------
+
         configuration.setAllowCredentials(true);
+
+        // -------------------------------------------------
+        // APPLY CORS TO ALL ENDPOINTS
+        // -------------------------------------------------
 
         UrlBasedCorsConfigurationSource source =
                 new UrlBasedCorsConfigurationSource();
