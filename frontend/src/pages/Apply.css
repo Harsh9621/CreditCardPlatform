@@ -1,0 +1,208 @@
+.apply-page {
+  min-height: 100vh;
+  padding: 110px 24px 60px;
+  background: #f5f8fc;
+}
+
+.apply-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 25px;
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.apply-layout {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 30px;
+  align-items: start;
+}
+
+.apply-card-info,
+.apply-form-card {
+  background: white;
+  border-radius: 20px;
+  padding: 35px;
+  box-shadow: 0 10px 35px rgba(15, 23, 42, 0.08);
+}
+
+.apply-label {
+  color: #2563eb;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.apply-card-info h1 {
+  margin: 14px 0 8px;
+  font-size: 32px;
+  color: #0f172a;
+}
+
+.apply-bank {
+  color: #64748b;
+  font-size: 17px;
+  margin-bottom: 30px;
+}
+
+.apply-card-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.apply-card-summary div {
+  padding: 18px;
+  background: #f8fafc;
+  border-radius: 12px;
+}
+
+.apply-card-summary span {
+  display: block;
+  color: #64748b;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.apply-card-summary strong {
+  color: #0f172a;
+  font-size: 18px;
+}
+
+.apply-benefits {
+  margin-top: 30px;
+  padding-top: 25px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.apply-benefits h3 {
+  color: #0f172a;
+  margin-bottom: 10px;
+}
+
+.apply-benefits p {
+  color: #64748b;
+  line-height: 1.7;
+}
+
+.apply-form-heading h2 {
+  margin: 0 0 8px;
+  color: #0f172a;
+}
+
+.apply-form-heading p {
+  margin-bottom: 25px;
+  color: #64748b;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 7px;
+  color: #334155;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 13px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: white;
+  font-size: 15px;
+  outline: none;
+  transition: 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.form-group textarea {
+  resize: vertical;
+}
+
+.submit-application {
+  width: 100%;
+  border: none;
+  border-radius: 10px;
+  padding: 15px;
+  background: #2563eb;
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.submit-application:hover {
+  background: #1d4ed8;
+}
+
+.submit-application:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.apply-error {
+  margin-bottom: 20px;
+  padding: 12px 15px;
+  border-radius: 10px;
+  background: #fef2f2;
+  color: #dc2626;
+  font-size: 14px;
+}
+
+.apply-message {
+  max-width: 700px;
+  margin: 100px auto 20px;
+  padding: 30px;
+  background: white;
+  border-radius: 15px;
+  text-align: center;
+}
+
+.apply-message.error {
+  color: #dc2626;
+}
+
+@media (max-width: 850px) {
+  .apply-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .apply-page {
+    padding: 90px 16px 40px;
+  }
+
+  .apply-card-info,
+  .apply-form-card {
+    padding: 25px;
+  }
+}
+
+@media (max-width: 500px) {
+  .apply-card-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .apply-card-info h1 {
+    font-size: 26px;
+  }
+}

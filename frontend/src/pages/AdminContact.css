@@ -1,0 +1,615 @@
+/* =====================================================
+   CARDWISE ADMIN CONTACT CENTER
+===================================================== */
+
+.admin-contact-page {
+  min-height: calc(100vh - 72px);
+  padding: 45px 24px 80px;
+  background: #f5f8fc;
+  color: #172b4d;
+}
+
+.admin-contact-header {
+  width: min(1200px, 94%);
+  margin: 0 auto 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 25px;
+}
+
+.admin-contact-label {
+  color: #1264df;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.admin-contact-header h1 {
+  margin: 8px 0 7px;
+  color: #172b4d;
+  font-size: clamp(30px, 4vw, 43px);
+  letter-spacing: -1px;
+}
+
+.admin-contact-header p {
+  margin: 0;
+  color: #718096;
+  font-size: 14px;
+}
+
+.applicant-summary {
+  min-width: 155px;
+  padding: 18px 22px;
+  border: 1px solid #dbe6f4;
+  border-radius: 15px;
+  background: #ffffff;
+  text-align: center;
+  box-shadow: 0 8px 25px rgba(20, 55, 100, 0.06);
+}
+
+.applicant-summary strong {
+  display: block;
+  color: #1264df;
+  font-size: 28px;
+}
+
+.applicant-summary span {
+  color: #718096;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* =====================================================
+   TOOLBAR
+===================================================== */
+
+.admin-contact-toolbar {
+  width: min(1200px, 94%);
+  margin: 0 auto 25px;
+  display: flex;
+  gap: 12px;
+}
+
+.contact-search {
+  flex: 1;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 15px;
+  border: 1px solid #dbe5f0;
+  border-radius: 11px;
+  background: #ffffff;
+  box-shadow: 0 5px 18px rgba(20, 55, 100, 0.04);
+}
+
+.contact-search span {
+  color: #718096;
+  font-size: 21px;
+}
+
+.contact-search input {
+  width: 100%;
+  border: 0;
+  outline: none;
+  color: #172b4d;
+  background: transparent;
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.contact-search input::placeholder {
+  color: #94a3b8;
+}
+
+.refresh-contact-btn {
+  min-width: 100px;
+  border: 1px solid #cbdaf3;
+  border-radius: 11px;
+  background: #eff6ff;
+  color: #1264df;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.refresh-contact-btn:hover {
+  background: #e2efff;
+}
+
+/* =====================================================
+   APPLICANT GRID
+===================================================== */
+
+.applicant-grid {
+  width: min(1200px, 94%);
+  margin: auto;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.applicant-card {
+  padding: 22px;
+  border: 1px solid #dfe7f1;
+  border-radius: 17px;
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(20, 55, 100, 0.06);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.applicant-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 38px rgba(20, 55, 100, 0.1);
+}
+
+/* =====================================================
+   APPLICANT TOP
+===================================================== */
+
+.applicant-card-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.applicant-avatar,
+.modal-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  color: #ffffff;
+  background: linear-gradient(135deg, #2563eb, #0f4cbd);
+  font-weight: 800;
+}
+
+.applicant-avatar {
+  width: 46px;
+  height: 46px;
+  font-size: 16px;
+}
+
+.applicant-main-info {
+  min-width: 0;
+  flex: 1;
+}
+
+.applicant-main-info h2 {
+  margin: 0;
+  overflow: hidden;
+  color: #172b4d;
+  font-size: 16px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.applicant-main-info span {
+  display: block;
+  margin-top: 3px;
+  color: #8492a6;
+  font-size: 10px;
+}
+
+.application-status {
+  padding: 5px 8px;
+  border-radius: 20px;
+  color: #1264df;
+  background: #edf5ff;
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.application-status.approved {
+  color: #08763f;
+  background: #eaf9ef;
+}
+
+.application-status.rejected {
+  color: #b42318;
+  background: #fff0ee;
+}
+
+/* =====================================================
+   APPLIED CARD
+===================================================== */
+
+.applied-card-box {
+  margin-top: 18px;
+  padding: 14px;
+  border: 1px solid #e0e9f5;
+  border-radius: 11px;
+  background: #f7faff;
+}
+
+.applied-card-box span,
+.applicant-detail span,
+.modal-info-grid span {
+  display: block;
+  color: #8a98aa;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+}
+
+.applied-card-box strong {
+  display: block;
+  margin-top: 4px;
+  color: #243b59;
+  font-size: 13px;
+}
+
+.applied-card-box small {
+  display: block;
+  margin-top: 3px;
+  color: #718096;
+  font-size: 10px;
+}
+
+/* =====================================================
+   DETAILS
+===================================================== */
+
+.applicant-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.applicant-detail {
+  min-width: 0;
+}
+
+.applicant-detail strong {
+  display: block;
+  margin-top: 4px;
+  overflow: hidden;
+  color: #344b68;
+  font-size: 11px;
+  line-height: 1.5;
+  text-overflow: ellipsis;
+}
+
+.applicant-detail:nth-child(3) strong {
+  white-space: normal;
+}
+
+/* =====================================================
+   ACTIONS
+===================================================== */
+
+.applicant-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.applicant-actions button,
+.applicant-actions a {
+  min-height: 39px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 13px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.view-applicant-btn {
+  flex: 1;
+  border: 1px solid #d7e1ee;
+  background: #ffffff;
+  color: #35506d;
+}
+
+.view-applicant-btn:hover {
+  background: #f4f8fd;
+}
+
+.call-applicant-btn {
+  border: 1px solid #bde6cc;
+  background: #effbf3;
+  color: #08763f;
+}
+
+.email-applicant-btn {
+  border: 1px solid #cbdaf3;
+  background: #eff6ff;
+  color: #1264df;
+}
+
+.call-applicant-btn:hover {
+  background: #ddf7e7;
+}
+
+.email-applicant-btn:hover {
+  background: #e2efff;
+}
+
+/* =====================================================
+   EMPTY
+===================================================== */
+
+.contact-empty,
+.admin-contact-loading,
+.admin-contact-error {
+  width: min(900px, 94%);
+  margin: 30px auto;
+  padding: 65px 25px;
+  border: 1px solid #dfe7f1;
+  border-radius: 18px;
+  background: #ffffff;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(20, 55, 100, 0.05);
+}
+
+.contact-empty > div,
+.contact-error-icon {
+  width: 55px;
+  height: 55px;
+  margin: 0 auto 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 15px;
+  background: #edf5ff;
+  color: #1264df;
+  font-size: 25px;
+}
+
+.contact-empty h2,
+.admin-contact-loading h2,
+.admin-contact-error h2 {
+  margin: 0 0 8px;
+  color: #172b4d;
+  font-size: 20px;
+}
+
+.contact-empty p,
+.admin-contact-loading p,
+.admin-contact-error p {
+  margin: 0;
+  color: #718096;
+  font-size: 13px;
+}
+
+.admin-contact-error button {
+  margin-top: 20px;
+  padding: 11px 18px;
+  border: 0;
+  border-radius: 8px;
+  color: #ffffff;
+  background: #1264df;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* =====================================================
+   LOADER
+===================================================== */
+
+.admin-contact-loader {
+  width: 42px;
+  height: 42px;
+  margin: 0 auto 18px;
+  border: 4px solid #dceaff;
+  border-top-color: #1264df;
+  border-radius: 50%;
+  animation: contactSpin 0.8s linear infinite;
+}
+
+@keyframes contactSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =====================================================
+   MODAL
+===================================================== */
+
+.applicant-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(5px);
+}
+
+.applicant-modal {
+  position: relative;
+  width: min(620px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 28px;
+  border: 1px solid #dce5f0;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0 30px 80px rgba(15, 23, 42, 0.25);
+  animation: contactModalIn 0.2s ease-out;
+}
+
+@keyframes contactModalIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 50%;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.modal-profile-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-right: 35px;
+}
+
+.modal-avatar {
+  width: 58px;
+  height: 58px;
+  font-size: 20px;
+}
+
+.modal-profile-header h2 {
+  margin: 0;
+  color: #172b4d;
+  font-size: 21px;
+}
+
+.modal-profile-header p {
+  margin: 4px 0 0;
+  color: #718096;
+  font-size: 12px;
+}
+
+.modal-section {
+  margin-top: 25px;
+}
+
+.modal-section h3 {
+  margin: 0 0 12px;
+  color: #263d5b;
+  font-size: 13px;
+}
+
+.modal-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid #e1e9f3;
+  border-radius: 12px;
+  background: #f8fbff;
+}
+
+.modal-info-grid strong {
+  display: block;
+  margin-top: 4px;
+  color: #344b68;
+  font-size: 12px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.modal-actions a {
+  flex: 1;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.modal-call-btn {
+  color: #ffffff;
+  background: #08763f;
+}
+
+.modal-email-btn {
+  color: #1264df;
+  background: #edf5ff;
+  border: 1px solid #cbdaf3;
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 900px) {
+  .applicant-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 650px) {
+  .admin-contact-page {
+    padding: 30px 15px 60px;
+  }
+
+  .admin-contact-header {
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .applicant-summary {
+    width: 100%;
+  }
+
+  .admin-contact-toolbar {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .refresh-contact-btn {
+    min-height: 45px;
+  }
+
+  .applicant-grid {
+    width: 100%;
+  }
+
+  .applicant-details {
+    grid-template-columns: 1fr;
+  }
+
+  .applicant-actions {
+    flex-direction: column;
+  }
+
+  .applicant-actions button,
+  .applicant-actions a {
+    width: 100%;
+  }
+
+  .modal-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+  }
+}

@@ -1,0 +1,1621 @@
+/* =========================================================
+   CARDWISE - CREDIT CARDS PAGE
+   ========================================================= */
+
+.cards-page {
+  min-height: 100vh;
+  background: #f5f8fc;
+  color: #172b4d;
+}
+
+/* =========================================================
+   APPLICATION POPUP / TOAST
+   ========================================================= */
+
+.cardwise-toast {
+  position: fixed;
+  top: 92px;
+  right: 28px;
+  z-index: 99999;
+  width: min(390px, calc(100vw - 40px));
+
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+
+  padding: 16px 17px;
+
+  border: 1px solid #dce5f0;
+  border-radius: 14px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 18px 50px rgba(15, 23, 42, 0.16),
+    0 5px 15px rgba(15, 23, 42, 0.07);
+
+  animation:
+    cardwiseToastIn 0.32s ease-out,
+    cardwiseToastOut 0.3s ease-in 4.7s forwards;
+}
+
+@keyframes cardwiseToastIn {
+  from {
+    opacity: 0;
+    transform: translateX(35px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes cardwiseToastOut {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateX(25px);
+  }
+}
+
+/* =========================================================
+   TOAST TYPES
+   ========================================================= */
+
+.cardwise-toast-success {
+  border-left: 4px solid #16a34a;
+}
+
+.cardwise-toast-warning {
+  border-left: 4px solid #eab308;
+}
+
+.cardwise-toast-error {
+  border-left: 4px solid #dc2626;
+}
+
+/* =========================================================
+   TOAST ICON
+   ========================================================= */
+
+.toast-icon {
+  width: 35px;
+  height: 35px;
+  flex: 0 0 35px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  font-size: 17px;
+  font-weight: 900;
+}
+
+.cardwise-toast-success .toast-icon {
+  color: #15803d;
+  background: #dcfce7;
+}
+
+.cardwise-toast-warning .toast-icon {
+  color: #a16207;
+  background: #fef9c3;
+}
+
+.cardwise-toast-error .toast-icon {
+  color: #b91c1c;
+  background: #fee2e2;
+}
+
+/* =========================================================
+   TOAST CONTENT
+   ========================================================= */
+
+.toast-content {
+  min-width: 0;
+  flex: 1;
+  padding-top: 1px;
+}
+
+.toast-content strong {
+  display: block;
+
+  margin-bottom: 4px;
+
+  color: #172b4d;
+
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.toast-content p {
+  margin: 0;
+
+  color: #66758a;
+
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.55;
+
+  overflow-wrap: anywhere;
+}
+
+/* =========================================================
+   TOAST CLOSE
+   ========================================================= */
+
+.toast-close {
+  width: 25px;
+  height: 25px;
+  flex: 0 0 25px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: 0;
+  border-radius: 7px;
+
+  background: transparent;
+  color: #94a3b8;
+
+  font-size: 19px;
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.toast-close:hover {
+  color: #334155;
+  background: #f1f5f9;
+}
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+.cards-hero {
+  position: relative;
+  overflow: hidden;
+
+  padding: 75px 24px 85px;
+
+  background:
+    radial-gradient(
+      circle at 85% 20%,
+      rgba(255, 255, 255, 0.14),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 10% 90%,
+      rgba(72, 145, 255, 0.18),
+      transparent 28%
+    ),
+    linear-gradient(135deg, #062b67 0%, #0d55c7 55%, #1877f2 100%);
+
+  color: #ffffff;
+}
+
+.cards-hero::before {
+  content: "";
+
+  position: absolute;
+
+  width: 330px;
+  height: 330px;
+
+  right: -130px;
+  top: -160px;
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 50%;
+}
+
+.cards-hero::after {
+  content: "";
+
+  position: absolute;
+
+  width: 450px;
+  height: 450px;
+
+  left: -280px;
+  bottom: -350px;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+}
+
+.cards-hero-content {
+  position: relative;
+  z-index: 2;
+
+  width: min(1150px, 94%);
+
+  margin: auto;
+}
+
+.section-badge {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 7px 13px;
+
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 30px;
+
+  background: rgba(255, 255, 255, 0.09);
+
+  color: #e6f0ff;
+
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+}
+
+.cards-hero h1 {
+  max-width: 750px;
+
+  margin: 18px 0 13px;
+
+  font-size: clamp(36px, 5vw, 58px);
+  line-height: 1.08;
+
+  letter-spacing: -1.5px;
+}
+
+.cards-hero p {
+  max-width: 680px;
+
+  margin: 0;
+
+  color: #dceaff;
+
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.hero-stats {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 45px;
+
+  margin-top: 38px;
+}
+
+.hero-stats div {
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+.hero-stats strong {
+  color: #ffffff;
+
+  font-size: 24px;
+}
+
+.hero-stats span {
+  color: #cbdcf7;
+
+  font-size: 12px;
+}
+
+/* =========================================================
+   MAIN SECTION
+   ========================================================= */
+
+.cards-section {
+  padding: 55px 24px 90px;
+}
+
+.cards-container {
+  width: min(1180px, 94%);
+
+  margin: auto;
+}
+
+/* =========================================================
+   SECTION HEADER
+   ========================================================= */
+
+.cards-heading {
+  display: flex;
+
+  justify-content: space-between;
+  align-items: flex-end;
+
+  gap: 25px;
+
+  margin-bottom: 30px;
+}
+
+.small-title {
+  display: block;
+
+  margin-bottom: 7px;
+
+  color: #1769e8;
+
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+}
+
+.cards-heading h2 {
+  margin: 0;
+
+  color: #172b4d;
+
+  font-size: 32px;
+
+  letter-spacing: -0.6px;
+}
+
+.cards-heading p {
+  max-width: 620px;
+
+  margin: 8px 0 0;
+
+  color: #718096;
+
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.card-count {
+  flex-shrink: 0;
+
+  padding: 9px 15px;
+
+  border: 1px solid #d9e6f7;
+  border-radius: 30px;
+
+  background: #edf5ff;
+
+  color: #1264df;
+
+  font-size: 12px;
+  font-weight: 800;
+}
+
+/* =========================================================
+   CARD GRID
+   ========================================================= */
+
+.credit-cards-grid {
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 25px;
+}
+
+/* =========================================================
+   CARD ITEM
+   ========================================================= */
+
+.credit-card-item {
+  overflow: hidden;
+
+  border: 1px solid #dfe7f1;
+  border-radius: 20px;
+
+  background: #ffffff;
+
+  box-shadow: 0 12px 35px rgba(20, 55, 100, 0.07);
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.credit-card-item:hover {
+  transform: translateY(-5px);
+
+  border-color: #c8dbf5;
+
+  box-shadow: 0 18px 45px rgba(20, 70, 130, 0.13);
+}
+
+/* =========================================================
+   CREDIT CARD VISUAL
+   ========================================================= */
+
+.card-visual {
+  position: relative;
+
+  min-height: 235px;
+
+  padding: 25px;
+
+  overflow: hidden;
+
+  color: #ffffff;
+
+  background:
+    radial-gradient(
+      circle at 85% 15%,
+      rgba(255, 255, 255, 0.2),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 10% 100%,
+      rgba(70, 150, 255, 0.2),
+      transparent 35%
+    ),
+    linear-gradient(135deg, #071f49, #0c4fae 60%, #126ff2);
+}
+
+.card-visual::before {
+  content: "";
+
+  position: absolute;
+
+  width: 270px;
+  height: 270px;
+
+  right: -140px;
+  bottom: -150px;
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 50%;
+}
+
+.card-visual::after {
+  content: "";
+
+  position: absolute;
+
+  width: 160px;
+  height: 160px;
+
+  right: 40px;
+  top: -100px;
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+}
+
+.card-visual-top {
+  position: relative;
+  z-index: 2;
+
+  display: flex;
+
+  justify-content: space-between;
+  align-items: center;
+}
+
+.bank-logo {
+  width: 43px;
+  height: 43px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 11px;
+
+  background: rgba(255, 255, 255, 0.12);
+
+  backdrop-filter: blur(10px);
+
+  font-size: 19px;
+  font-weight: 900;
+}
+
+.card-brand {
+  font-size: 15px;
+  font-weight: 800;
+
+  letter-spacing: 0.3px;
+}
+
+.card-chip {
+  position: relative;
+  z-index: 2;
+
+  width: 45px;
+  height: 33px;
+
+  margin-top: 28px;
+
+  border-radius: 7px;
+
+  background: linear-gradient(135deg, #f2d98b, #b88a38);
+
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+}
+
+.card-chip span,
+.card-chip::before,
+.card-chip::after {
+  position: absolute;
+
+  content: "";
+}
+
+.card-chip span {
+  left: 21px;
+  top: 0;
+
+  width: 1px;
+  height: 100%;
+
+  background: rgba(80, 55, 15, 0.4);
+}
+
+.card-chip::before {
+  left: 0;
+  top: 10px;
+
+  width: 100%;
+  height: 1px;
+
+  background: rgba(80, 55, 15, 0.4);
+}
+
+.card-number {
+  position: relative;
+  z-index: 2;
+
+  margin-top: 22px;
+
+  font-size: 19px;
+  font-weight: 600;
+
+  letter-spacing: 3px;
+}
+
+.card-visual-bottom {
+  position: relative;
+  z-index: 2;
+
+  display: flex;
+
+  justify-content: space-between;
+  align-items: flex-end;
+
+  margin-top: 22px;
+}
+
+.card-visual-bottom div {
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+.card-visual-bottom small {
+  color: #aecaee;
+
+  font-size: 7px;
+
+  letter-spacing: 1px;
+}
+
+.card-visual-bottom strong {
+  font-size: 10px;
+
+  letter-spacing: 1px;
+}
+
+/* =========================================================
+   CARD CONTENT
+   ========================================================= */
+
+.credit-card-content {
+  padding: 25px;
+}
+
+.card-title-row {
+  display: flex;
+
+  justify-content: space-between;
+  align-items: flex-start;
+
+  gap: 15px;
+}
+
+.card-title-row h3 {
+  margin: 0;
+
+  color: #172b4d;
+
+  font-size: 20px;
+  line-height: 1.3;
+}
+
+.bank-name {
+  margin: 5px 0 0;
+
+  color: #77869a;
+
+  font-size: 12px;
+}
+
+.card-type {
+  flex-shrink: 0;
+
+  padding: 6px 10px;
+
+  border-radius: 20px;
+
+  background: #edf5ff;
+
+  color: #1264df;
+
+  font-size: 9px;
+  font-weight: 800;
+
+  text-transform: uppercase;
+}
+
+/* =========================================================
+   CARD DETAILS
+   ========================================================= */
+
+.card-details {
+  display: grid;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  margin-top: 22px;
+
+  padding: 15px 0;
+
+  border-top: 1px solid #edf1f6;
+  border-bottom: 1px solid #edf1f6;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+
+  gap: 5px;
+
+  padding: 0 13px;
+
+  border-right: 1px solid #edf1f6;
+}
+
+.detail-item:first-child {
+  padding-left: 0;
+}
+
+.detail-item:last-child {
+  padding-right: 0;
+
+  border-right: 0;
+}
+
+.detail-item span {
+  color: #8b98aa;
+
+  font-size: 10px;
+}
+
+.detail-item strong {
+  color: #263d5b;
+
+  font-size: 13px;
+}
+
+.detail-item.highlight strong {
+  color: #08763f;
+}
+
+/* =========================================================
+   REWARD BOX
+   ========================================================= */
+
+.reward-box {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  margin-top: 17px;
+
+  padding: 13px;
+
+  border: 1px solid #e1eafb;
+  border-radius: 11px;
+
+  background: #f6f9ff;
+}
+
+.feature-icon {
+  width: 34px;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 9px;
+
+  background: #e7f0ff;
+
+  color: #1264df;
+
+  font-size: 15px;
+}
+
+.reward-box div:last-child {
+  display: flex;
+  flex-direction: column;
+
+  gap: 2px;
+}
+
+.reward-box span {
+  color: #8a98aa;
+
+  font-size: 9px;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.6px;
+}
+
+.reward-box strong {
+  color: #273f5e;
+
+  font-size: 12px;
+}
+
+/* =========================================================
+   INFO BOX
+   ========================================================= */
+
+.info-box {
+  margin-top: 15px;
+}
+
+.info-box h4 {
+  margin: 0 0 5px;
+
+  color: #314963;
+
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.info-box p {
+  margin: 0;
+
+  color: #718096;
+
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+/* =========================================================
+   CARD ACTIONS
+   ========================================================= */
+
+.card-actions {
+  display: flex;
+
+  gap: 10px;
+
+  margin-top: 22px;
+}
+
+.apply-button,
+.contact-card-button {
+  flex: 1;
+
+  min-height: 44px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 11px 15px;
+
+  border-radius: 9px;
+
+  font-size: 12px;
+  font-weight: 800;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+/* =========================================================
+   APPLY BUTTON
+   ========================================================= */
+
+.apply-button {
+  border: 1px solid #1264df;
+
+  background: linear-gradient(135deg, #1264df, #0878f9);
+
+  color: #ffffff;
+
+  box-shadow: 0 6px 15px rgba(18, 100, 223, 0.18);
+
+  cursor: pointer;
+}
+
+.apply-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+
+  box-shadow: 0 8px 20px rgba(18, 100, 223, 0.25);
+}
+
+.apply-button:disabled {
+  cursor: not-allowed;
+
+  opacity: 0.7;
+}
+
+.apply-button.already-applied {
+  border-color: #b9e5ca;
+
+  background: #eaf9ef;
+
+  color: #08763f;
+
+  box-shadow: none;
+}
+
+/* =========================================================
+   CONTACT BUTTON
+   ========================================================= */
+
+.contact-card-button {
+  border: 1px solid #cbdaf3;
+
+  color: #1264f5;
+
+  background: #f5f9ff;
+
+  text-decoration: none;
+
+  cursor: pointer;
+}
+
+.contact-card-button:hover {
+  transform: translateY(-1px);
+
+  border-color: #1264f5;
+
+  background: #eaf2ff;
+}
+
+/* =========================================================
+   EMPTY / LOADING / ERROR
+   ========================================================= */
+
+.cards-message {
+  padding: 65px 25px;
+
+  text-align: center;
+
+  border: 1px solid #e0e8f2;
+  border-radius: 18px;
+
+  background: #ffffff;
+
+  box-shadow: 0 10px 30px rgba(20, 55, 100, 0.05);
+}
+
+.message-icon {
+  width: 55px;
+  height: 55px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin: 0 auto 15px;
+
+  border-radius: 15px;
+
+  background: #edf5ff;
+
+  color: #1264df;
+
+  font-size: 25px;
+}
+
+.cards-message h3 {
+  margin: 0 0 8px;
+
+  color: #172b4d;
+
+  font-size: 19px;
+}
+
+.cards-message p {
+  margin: 0;
+
+  color: #718096;
+
+  font-size: 13px;
+}
+
+.primary-button {
+  margin-top: 20px;
+
+  padding: 11px 18px;
+
+  border: 0;
+  border-radius: 8px;
+
+  background: #1264df;
+
+  color: #ffffff;
+
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.primary-button:hover {
+  background: #0b55d4;
+}
+
+.loader {
+  width: 42px;
+  height: 42px;
+
+  margin: 0 auto 18px;
+
+  border: 4px solid #dceaff;
+
+  border-top-color: #1264df;
+
+  border-radius: 50%;
+
+  animation: cardsSpin 0.8s linear infinite;
+}
+
+@keyframes cardsSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================================================
+   CONTACT CTA
+   ========================================================= */
+
+.cards-contact-cta {
+  padding: 70px 24px;
+
+  background:
+    radial-gradient(
+      circle at 85% 30%,
+      rgba(18, 100, 245, 0.12),
+      transparent 30%
+    ),
+    #ffffff;
+
+  border-top: 1px solid #e5edf7;
+}
+
+.cards-contact-cta > div {
+  width: min(850px, 94%);
+
+  margin: auto;
+
+  padding: 45px;
+
+  text-align: center;
+
+  border: 1px solid #dce7f5;
+  border-radius: 20px;
+
+  background: #f7faff;
+
+  box-shadow: 0 15px 45px rgba(20, 55, 100, 0.07);
+}
+
+.cards-contact-cta span {
+  color: #1264f5;
+
+  font-size: 11px;
+  font-weight: 800;
+
+  letter-spacing: 1.5px;
+}
+
+.cards-contact-cta h2 {
+  margin: 10px 0;
+
+  color: #162d4a;
+
+  font-size: clamp(25px, 3vw, 34px);
+}
+
+.cards-contact-cta p {
+  max-width: 620px;
+
+  margin: 0 auto 22px;
+
+  color: #66758a;
+
+  line-height: 1.7;
+}
+
+.cards-contact-cta a {
+  display: inline-flex;
+
+  padding: 12px 20px;
+
+  border-radius: 9px;
+
+  color: #ffffff;
+
+  background: #1264f5;
+
+  text-decoration: none;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.cards-contact-cta a:hover {
+  background: #0b55d4;
+
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 950px) {
+  .credit-cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cards-container {
+    width: min(700px, 94%);
+  }
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 650px) {
+  .cardwise-toast {
+    top: 76px;
+
+    right: 15px;
+
+    width: calc(100vw - 30px);
+
+    padding: 14px;
+  }
+
+  .cards-hero {
+    padding: 55px 18px 65px;
+  }
+
+  .cards-hero-content {
+    width: 100%;
+  }
+
+  .cards-hero h1 {
+    font-size: 38px;
+  }
+
+  .cards-hero p {
+    font-size: 14px;
+  }
+
+  .hero-stats {
+    gap: 25px;
+
+    margin-top: 30px;
+  }
+
+  .cards-section {
+    padding: 40px 15px 65px;
+  }
+
+  .cards-container {
+    width: 100%;
+  }
+
+  .cards-heading {
+    flex-direction: column;
+
+    align-items: flex-start;
+  }
+
+  .cards-heading h2 {
+    font-size: 27px;
+  }
+
+  .credit-card-content {
+    padding: 20px;
+  }
+
+  .card-visual {
+    min-height: 220px;
+
+    padding: 21px;
+  }
+
+  .card-number {
+    font-size: 16px;
+
+    letter-spacing: 2px;
+  }
+
+  .card-details {
+    grid-template-columns: 1fr;
+
+    gap: 13px;
+  }
+
+  .detail-item,
+  .detail-item:first-child,
+  .detail-item:last-child {
+    padding: 0 0 10px;
+
+    border-right: 0;
+
+    border-bottom: 1px solid #edf1f6;
+  }
+
+  .detail-item:last-child {
+    padding-bottom: 0;
+
+    border-bottom: 0;
+  }
+
+  .card-actions {
+    flex-direction: column;
+  }
+
+  .contact-card-button,
+  .apply-button {
+    width: 100%;
+  }
+
+  .cards-contact-cta {
+    padding: 50px 15px;
+  }
+
+  .cards-contact-cta > div {
+    width: 100%;
+
+    padding: 30px 20px;
+  }
+}
+
+/* =========================================================
+   SMALL PHONE
+   ========================================================= */
+
+@media (max-width: 420px) {
+  .cardwise-toast {
+    top: 72px;
+  }
+
+  .cards-hero h1 {
+    font-size: 32px;
+  }
+
+  .hero-stats {
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 10px;
+  }
+
+  .hero-stats strong {
+    font-size: 19px;
+  }
+
+  .hero-stats span {
+    font-size: 10px;
+  }
+
+  .card-title-row {
+    flex-direction: column;
+  }
+
+  .card-type {
+    align-self: flex-start;
+  }
+
+  .card-visual {
+    min-height: 205px;
+  }
+
+  .card-chip {
+    margin-top: 20px;
+  }
+
+  .card-number {
+    margin-top: 17px;
+
+    font-size: 14px;
+  }
+
+  .card-visual-bottom {
+    margin-top: 18px;
+  }
+
+  .toast-content strong {
+    font-size: 13px;
+  }
+
+  .toast-content p {
+    font-size: 11px;
+  }
+}
+
+/* =========================================================
+   DARK MODE
+   ========================================================= */
+
+[data-theme="dark"] .cards-page {
+  background: #0b1220;
+
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .cards-heading h2,
+[data-theme="dark"] .card-title-row h3,
+[data-theme="dark"] .cards-message h3 {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .cards-heading p,
+[data-theme="dark"] .info-box p,
+[data-theme="dark"] .cards-message p {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .credit-card-item {
+  border-color: #263449;
+
+  background: #111827;
+
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme="dark"] .credit-card-item:hover {
+  border-color: #385275;
+}
+
+[data-theme="dark"] .card-count {
+  border-color: #29415f;
+
+  background: #16263d;
+
+  color: #60a5fa;
+}
+
+[data-theme="dark"] .card-details {
+  border-color: #243244;
+}
+
+[data-theme="dark"] .detail-item {
+  border-color: #243244;
+}
+
+[data-theme="dark"] .detail-item span,
+[data-theme="dark"] .bank-name,
+[data-theme="dark"] .reward-box span {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .detail-item strong,
+[data-theme="dark"] .reward-box strong {
+  color: #dbeafe;
+}
+
+[data-theme="dark"] .reward-box {
+  border-color: #263c59;
+
+  background: #142238;
+}
+
+[data-theme="dark"] .feature-icon {
+  background: #1b3558;
+
+  color: #60a5fa;
+}
+
+[data-theme="dark"] .info-box h4 {
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .contact-card-button {
+  border-color: #334155;
+
+  background: #172033;
+
+  color: #60a5fa;
+}
+
+[data-theme="dark"] .contact-card-button:hover {
+  border-color: #60a5fa;
+
+  background: #1d2b42;
+}
+
+[data-theme="dark"] .cards-message {
+  border-color: #263449;
+
+  background: #111827;
+}
+
+[data-theme="dark"] .cards-contact-cta {
+  border-color: #243244;
+
+  background: #0f172a;
+}
+
+[data-theme="dark"] .cards-contact-cta > div {
+  border-color: #263449;
+
+  background: #111827;
+}
+
+[data-theme="dark"] .cards-contact-cta h2 {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .cards-contact-cta p {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .cardwise-toast {
+  border-color: #334155;
+
+  background: #111827;
+
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+}
+
+[data-theme="dark"] .toast-content strong {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .toast-content p {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .toast-close {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .toast-close:hover {
+  color: #f8fafc;
+
+  background: #1e293b;
+}
+
+[data-theme="dark"] .cardwise-toast-success {
+  border-left-color: #22c55e;
+}
+
+[data-theme="dark"] .cardwise-toast-warning {
+  border-left-color: #eab308;
+}
+
+[data-theme="dark"] .cardwise-toast-error {
+  border-left-color: #ef4444;
+}
+
+/* =========================================================
+   ACCESSIBILITY
+   ========================================================= */
+
+.apply-button:focus-visible,
+.contact-card-button:focus-visible,
+.toast-close:focus-visible,
+.primary-button:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.28);
+
+  outline-offset: 3px;
+}
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .cardwise-toast {
+    animation: none;
+  }
+
+  .credit-card-item,
+  .apply-button,
+  .contact-card-button {
+    transition: none;
+  }
+}
+
+/* =========================================================
+   APPLICATION STATUS
+   ========================================================= */
+
+.application-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  margin-top: 16px;
+  padding: 9px 12px;
+
+  border-radius: 9px;
+
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.application-status-dot {
+  width: 7px;
+  height: 7px;
+
+  flex: 0 0 7px;
+
+  border-radius: 50%;
+}
+
+/* PENDING */
+
+.application-status.status-pending {
+  border: 1px solid #fde68a;
+  background: #fffbeb;
+  color: #a16207;
+}
+
+.application-status.status-pending .application-status-dot {
+  background: #eab308;
+}
+
+/* APPROVED */
+
+.application-status.status-approved {
+  border: 1px solid #bbf7d0;
+  background: #f0fdf4;
+  color: #15803d;
+}
+
+.application-status.status-approved .application-status-dot {
+  background: #16a34a;
+}
+
+/* REJECTED */
+
+.application-status.status-rejected {
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.application-status.status-rejected .application-status-dot {
+  background: #dc2626;
+}
+
+/* =========================================================
+   APPLICATION BUTTON STATES
+   ========================================================= */
+
+.apply-button.application-pending {
+  border-color: #eab308;
+
+  background: #fffbeb;
+
+  color: #a16207;
+
+  box-shadow: none;
+
+  cursor: not-allowed;
+}
+
+.apply-button.application-approved {
+  border-color: #16a34a;
+
+  background: #f0fdf4;
+
+  color: #15803d;
+
+  box-shadow: none;
+
+  cursor: not-allowed;
+}
+
+.apply-button.application-rejected {
+  border-color: #1264df;
+
+  background: linear-gradient(135deg, #1264df, #0878f9);
+
+  color: #ffffff;
+
+  cursor: pointer;
+}
+
+/* =========================================================
+   DARK MODE - APPLICATION STATUS
+   ========================================================= */
+
+[data-theme="dark"] .application-status.status-pending {
+  border-color: #5b4b13;
+  background: #2a2410;
+  color: #facc15;
+}
+
+[data-theme="dark"] .application-status.status-pending .application-status-dot {
+  background: #facc15;
+}
+
+[data-theme="dark"] .application-status.status-approved {
+  border-color: #245b38;
+  background: #10261a;
+  color: #4ade80;
+}
+
+[data-theme="dark"]
+  .application-status.status-approved
+  .application-status-dot {
+  background: #22c55e;
+}
+
+[data-theme="dark"] .application-status.status-rejected {
+  border-color: #632b2b;
+  background: #2a1515;
+  color: #f87171;
+}
+
+[data-theme="dark"]
+  .application-status.status-rejected
+  .application-status-dot {
+  background: #ef4444;
+}
+
+[data-theme="dark"] .apply-button.application-pending {
+  border-color: #665817;
+
+  background: #29240f;
+
+  color: #facc15;
+}
+
+[data-theme="dark"] .apply-button.application-approved {
+  border-color: #285d3b;
+
+  background: #102619;
+
+  color: #4ade80;
+}

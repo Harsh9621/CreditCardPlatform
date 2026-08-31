@@ -1,0 +1,498 @@
+/* ==========================================
+   ADMIN CARDS PAGE
+========================================== */
+
+.admin-cards-page {
+  min-height: 100vh;
+  background: #f5f8fc;
+  color: #172033;
+}
+
+/* ==========================================
+   HERO
+========================================== */
+
+.admin-cards-hero {
+  background:
+    radial-gradient(
+      circle at 85% 20%,
+      rgba(91, 159, 255, 0.25),
+      transparent 30%
+    ),
+    linear-gradient(135deg, #06183b, #0b3475, #0e55ac);
+
+  color: white;
+  padding: 70px 24px 100px;
+}
+
+.admin-cards-hero-content {
+  max-width: 1180px;
+  margin: auto;
+}
+
+.admin-cards-badge {
+  display: inline-flex;
+  padding: 8px 15px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #d9e8ff;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+}
+
+.admin-cards-hero h1 {
+  margin: 22px 0 14px;
+  font-size: clamp(38px, 5vw, 58px);
+  line-height: 1.05;
+}
+
+.admin-cards-hero h1 span {
+  color: #91c8ff;
+}
+
+.admin-cards-hero p {
+  max-width: 700px;
+  margin: 0;
+  color: #d8e7ff;
+  line-height: 1.7;
+  font-size: 17px;
+}
+
+/* ==========================================
+   MAIN
+========================================== */
+
+.admin-cards-main {
+  max-width: 1180px;
+  margin: -50px auto 0;
+  padding: 0 24px 80px;
+  position: relative;
+}
+
+/* ==========================================
+   ALERTS
+========================================== */
+
+.admin-card-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 22px;
+  padding: 17px 20px;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(15, 35, 70, 0.08);
+}
+
+.admin-card-alert.success {
+  border-left: 5px solid #16a34a;
+}
+
+.admin-card-alert.error {
+  border-left: 5px solid #dc2626;
+}
+
+.alert-icon {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #edf5ff;
+  font-weight: 900;
+}
+
+.alert-content {
+  flex: 1;
+}
+
+.alert-content strong {
+  display: block;
+  margin-bottom: 3px;
+}
+
+.alert-content p {
+  margin: 0;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+.admin-card-alert button {
+  border: 0;
+  background: transparent;
+  color: #64748b;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+/* ==========================================
+   SECTION
+========================================== */
+
+.admin-card-form-section {
+  padding: 35px;
+  margin-bottom: 55px;
+  background: white;
+  border-radius: 22px;
+  box-shadow: 0 15px 45px rgba(15, 35, 70, 0.08);
+}
+
+.admin-section-heading {
+  margin-bottom: 28px;
+}
+
+.admin-section-heading > span {
+  color: #1769d2;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+}
+
+.admin-section-heading h2 {
+  margin: 8px 0 6px;
+  font-size: 29px;
+}
+
+.admin-section-heading p {
+  margin: 0;
+  color: #64748b;
+  line-height: 1.6;
+}
+
+/* ==========================================
+   FORM
+========================================== */
+
+.admin-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.admin-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.admin-form-group.full {
+  grid-column: 1 / -1;
+}
+
+.admin-form-group label {
+  color: #334155;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.admin-form-group input,
+.admin-form-group textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 13px 14px;
+  border: 1px solid #d9e1eb;
+  border-radius: 11px;
+  outline: none;
+  background: #fbfdff;
+  color: #172033;
+  font: inherit;
+  transition: 0.2s;
+}
+
+.admin-form-group textarea {
+  resize: vertical;
+}
+
+.admin-form-group input:focus,
+.admin-form-group textarea:focus {
+  border-color: #1769d2;
+  box-shadow: 0 0 0 3px rgba(23, 105, 210, 0.1);
+}
+
+/* ==========================================
+   FORM BUTTONS
+========================================== */
+
+.admin-form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 25px;
+}
+
+.admin-save-button,
+.admin-cancel-button {
+  border: 0;
+  border-radius: 11px;
+  padding: 13px 22px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.admin-save-button {
+  background: #1769d2;
+  color: white;
+}
+
+.admin-save-button:hover {
+  background: #0d57b7;
+}
+
+.admin-save-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.admin-cancel-button {
+  background: #e8eef6;
+  color: #334155;
+}
+
+/* ==========================================
+   CARD INVENTORY
+========================================== */
+
+.admin-managed-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+}
+
+/* ==========================================
+   MANAGED CARD
+========================================== */
+
+.admin-managed-card {
+  background: white;
+  border: 1px solid #e3e9f1;
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 8px 28px rgba(15, 35, 70, 0.06);
+  transition: 0.25s;
+}
+
+.admin-managed-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px rgba(15, 35, 70, 0.1);
+}
+
+/* ==========================================
+   HEADER
+========================================== */
+
+.managed-card-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 23px;
+}
+
+.managed-card-icon {
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  border-radius: 15px;
+  background: #eaf3ff;
+  font-size: 27px;
+}
+
+.managed-card-title span {
+  display: block;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.managed-card-title h3 {
+  margin: 4px 0 0;
+  font-size: 19px;
+}
+
+/* ==========================================
+   STATS
+========================================== */
+
+.managed-card-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  padding: 17px 0;
+  border-top: 1px solid #edf1f6;
+  border-bottom: 1px solid #edf1f6;
+}
+
+.managed-card-stats span,
+.managed-card-details span {
+  display: block;
+  margin-bottom: 5px;
+  color: #94a3b8;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.8px;
+}
+
+.managed-card-stats strong {
+  font-size: 14px;
+}
+
+/* ==========================================
+   DETAILS
+========================================== */
+
+.managed-card-details {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 18px 0;
+}
+
+.managed-card-details p {
+  margin: 0;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+/* ==========================================
+   ACTIONS
+========================================== */
+
+.managed-card-actions {
+  display: flex;
+  gap: 10px;
+  padding-top: 4px;
+}
+
+.managed-card-actions button {
+  flex: 1;
+  padding: 11px;
+  border: 0;
+  border-radius: 9px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.edit-card-button {
+  background: #eaf3ff;
+  color: #1769d2;
+}
+
+.edit-card-button:hover {
+  background: #dcecff;
+}
+
+.delete-card-button {
+  background: #fff0f0;
+  color: #dc2626;
+}
+
+.delete-card-button:hover {
+  background: #ffe0e0;
+}
+
+/* ==========================================
+   EMPTY
+========================================== */
+
+.admin-no-cards {
+  padding: 60px 20px;
+  background: white;
+  border-radius: 20px;
+  text-align: center;
+}
+
+.no-card-icon {
+  font-size: 50px;
+}
+
+.admin-no-cards h3 {
+  margin: 12px 0 6px;
+  font-size: 21px;
+}
+
+.admin-no-cards p {
+  margin: 0;
+  color: #64748b;
+}
+
+/* ==========================================
+   LOADING
+========================================== */
+
+.admin-cards-loading-page {
+  min-height: 75vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  background: #f5f8fc;
+}
+
+.admin-cards-loading-page h2 {
+  margin: 15px 0 5px;
+}
+
+.admin-cards-loading-page p {
+  color: #64748b;
+}
+
+.admin-cards-spinner {
+  width: 42px;
+  height: 42px;
+  border: 4px solid #dce7f5;
+  border-top-color: #1769d2;
+  border-radius: 50%;
+  animation: adminCardsSpin 0.8s linear infinite;
+}
+
+@keyframes adminCardsSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media (max-width: 850px) {
+  .admin-managed-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .admin-cards-hero {
+    padding: 55px 20px 90px;
+  }
+
+  .admin-cards-main {
+    padding: 0 15px 60px;
+  }
+
+  .admin-card-form-section {
+    padding: 25px;
+  }
+
+  .admin-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-form-group.full {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 450px) {
+  .admin-form-actions {
+    flex-direction: column;
+  }
+
+  .managed-card-actions {
+    flex-direction: column;
+  }
+}

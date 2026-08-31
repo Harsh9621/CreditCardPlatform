@@ -1,0 +1,1455 @@
+/* =========================================================
+   CARDWISE HOME PAGE
+========================================================= */
+
+.home-page {
+  min-height: 100vh;
+  overflow-x: hidden;
+
+  background: var(--cw-bg, #ffffff);
+  color: var(--cw-text, #172033);
+}
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.home-hero {
+  position: relative;
+
+  min-height: 680px;
+
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  align-items: center;
+
+  gap: 45px;
+
+  padding: 75px 6% 90px;
+
+  overflow: hidden;
+
+  background:
+    radial-gradient(
+      circle at 80% 30%,
+      rgba(37, 99, 235, 0.14),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 15% 80%,
+      rgba(59, 130, 246, 0.08),
+      transparent 25%
+    ),
+    linear-gradient(180deg, #f8fbff 0%, #eef5ff 100%);
+}
+
+.home-hero::before {
+  content: "";
+
+  position: absolute;
+
+  width: 320px;
+  height: 320px;
+
+  right: -130px;
+  top: -130px;
+
+  border-radius: 50%;
+
+  border: 1px solid rgba(37, 99, 235, 0.08);
+}
+
+.home-hero-content {
+  position: relative;
+  z-index: 2;
+
+  width: min(650px, 100%);
+
+  margin-left: auto;
+}
+
+/* =========================================================
+   BADGE
+========================================================= */
+
+.home-badge {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 8px 14px;
+
+  border: 1px solid #d7e6ff;
+  border-radius: 999px;
+
+  color: #1264f5;
+  background: #eaf2ff;
+
+  font-size: 11px;
+  font-weight: 800;
+
+  letter-spacing: 1.3px;
+
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.06);
+}
+
+/* =========================================================
+   HERO HEADING
+========================================================= */
+
+.home-hero h1 {
+  margin: 20px 0 18px;
+
+  color: #162d4a;
+
+  font-size: clamp(44px, 5.2vw, 72px);
+
+  line-height: 1.02;
+
+  letter-spacing: -2.8px;
+
+  font-weight: 900;
+}
+
+.home-hero h1 span {
+  display: inline;
+
+  color: #1264f5;
+}
+
+.home-hero p {
+  max-width: 600px;
+
+  margin: 0;
+
+  color: #64748b;
+
+  font-size: 17px;
+
+  line-height: 1.8;
+}
+
+/* =========================================================
+   HERO ACTIONS
+========================================================= */
+
+.home-actions {
+  display: flex;
+
+  align-items: center;
+
+  flex-wrap: wrap;
+
+  gap: 12px;
+
+  margin-top: 32px;
+}
+
+.home-primary-button,
+.home-secondary-button {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 9px;
+
+  min-height: 48px;
+
+  padding: 0 21px;
+
+  border-radius: 10px;
+
+  text-decoration: none;
+
+  font-size: 14px;
+  font-weight: 800;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.home-primary-button {
+  color: #ffffff;
+
+  background: linear-gradient(135deg, #1264f5, #0b54d4);
+
+  box-shadow: 0 12px 28px rgba(18, 100, 245, 0.24);
+}
+
+.home-primary-button:hover {
+  transform: translateY(-3px);
+
+  box-shadow: 0 17px 32px rgba(18, 100, 245, 0.3);
+
+  background: linear-gradient(135deg, #0d58dd, #0847b9);
+}
+
+.home-primary-button span {
+  font-size: 17px;
+
+  transition: transform 0.2s ease;
+}
+
+.home-primary-button:hover span {
+  transform: translateX(3px);
+}
+
+.home-secondary-button {
+  color: #1264f5;
+
+  background: #ffffff;
+
+  border: 1px solid #cfe0ff;
+
+  box-shadow: 0 7px 20px rgba(20, 55, 100, 0.05);
+}
+
+.home-secondary-button:hover {
+  transform: translateY(-2px);
+
+  background: #f5f9ff;
+
+  border-color: #a9c8ff;
+}
+
+/* =========================================================
+   HERO STATS
+========================================================= */
+
+.home-stats {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 35px;
+
+  margin-top: 42px;
+}
+
+.home-stat {
+  position: relative;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+.home-stat strong {
+  color: #162d4a;
+
+  font-size: 28px;
+
+  font-weight: 900;
+}
+
+.home-stat span {
+  color: #7b8797;
+
+  font-size: 11px;
+
+  font-weight: 600;
+}
+
+/* =========================================================
+   CREDIT CARD AREA
+========================================================= */
+
+.home-card-area {
+  position: relative;
+
+  min-height: 500px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+}
+
+/* =========================================================
+   CARD GLOW
+========================================================= */
+
+.home-card-glow {
+  position: absolute;
+
+  width: 390px;
+  height: 390px;
+
+  border-radius: 50%;
+
+  background: radial-gradient(
+    circle,
+    rgba(37, 99, 235, 0.25),
+    rgba(37, 99, 235, 0.08) 40%,
+    transparent 70%
+  );
+
+  filter: blur(18px);
+
+  animation: homeGlow 5s ease-in-out infinite;
+}
+
+@keyframes homeGlow {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+/* =========================================================
+   CREDIT CARD
+========================================================= */
+
+.home-credit-card {
+  position: relative;
+  z-index: 2;
+
+  width: min(440px, 92vw);
+
+  min-height: 270px;
+
+  padding: 28px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: space-between;
+
+  overflow: hidden;
+
+  border: 1px solid rgba(255, 255, 255, 0.16);
+
+  border-radius: 24px;
+
+  color: #ffffff;
+
+  background:
+    radial-gradient(
+      circle at 85% 15%,
+      rgba(255, 255, 255, 0.2),
+      transparent 25%
+    ),
+    radial-gradient(
+      circle at 15% 100%,
+      rgba(255, 255, 255, 0.08),
+      transparent 30%
+    ),
+    linear-gradient(145deg, #082e6f, #1264f5 64%, #2f7bf6);
+
+  box-shadow: 0 30px 65px rgba(7, 50, 120, 0.3);
+
+  transform: rotate(-5deg);
+
+  transition:
+    transform 0.35s ease,
+    box-shadow 0.35s ease;
+}
+
+.home-credit-card::after {
+  content: "";
+
+  position: absolute;
+
+  width: 200px;
+  height: 200px;
+
+  right: -80px;
+  bottom: -100px;
+
+  border-radius: 50%;
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.home-credit-card:hover {
+  transform: rotate(-2deg) translateY(-5px);
+
+  box-shadow: 0 38px 75px rgba(7, 50, 120, 0.35);
+}
+
+/* =========================================================
+   CARD HEADER
+========================================================= */
+
+.home-credit-card-header {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  font-size: 17px;
+
+  font-weight: 800;
+}
+
+.home-card-bank {
+  width: 45px;
+  height: 45px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 12px;
+
+  color: #1264f5;
+
+  background: #ffffff;
+
+  font-size: 20px;
+  font-weight: 900;
+
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+/* =========================================================
+   CHIP
+========================================================= */
+
+.home-credit-card-chip {
+  width: 50px;
+  height: 37px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  margin-top: 12px;
+
+  border-radius: 8px;
+
+  background: linear-gradient(135deg, #d7cf9d, #f8f1bd);
+
+  box-shadow: inset 0 0 0 1px rgba(100, 90, 40, 0.2);
+}
+
+.home-credit-card-chip span {
+  width: 22px;
+  height: 22px;
+
+  border: 1px solid rgba(100, 90, 40, 0.4);
+
+  border-radius: 5px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent 45%,
+      rgba(100, 90, 40, 0.25) 46%,
+      transparent 50%
+    ),
+    linear-gradient(
+      0deg,
+      transparent 45%,
+      rgba(100, 90, 40, 0.25) 46%,
+      transparent 50%
+    );
+}
+
+/* =========================================================
+   CARD NUMBER
+========================================================= */
+
+.home-credit-card-number {
+  margin-top: 5px;
+
+  font-family: monospace;
+
+  font-size: 18px;
+
+  letter-spacing: 2px;
+
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+/* =========================================================
+   CARD FOOTER
+========================================================= */
+
+.home-credit-card-footer {
+  display: flex;
+
+  justify-content: space-between;
+
+  gap: 20px;
+}
+
+.home-credit-card-footer div {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 5px;
+}
+
+.home-credit-card-footer small {
+  font-size: 8px;
+
+  opacity: 0.65;
+
+  letter-spacing: 0.7px;
+}
+
+.home-credit-card-footer strong {
+  font-size: 10px;
+
+  letter-spacing: 1px;
+}
+
+/* =========================================================
+   CARD NETWORK
+========================================================= */
+
+.home-card-network {
+  position: absolute;
+
+  right: 28px;
+  bottom: 26px;
+
+  font-size: 22px;
+
+  font-weight: 900;
+
+  font-style: italic;
+
+  letter-spacing: -1px;
+}
+
+/* =========================================================
+   FLOATING INFO CARDS
+========================================================= */
+
+.home-floating-card {
+  position: absolute;
+
+  z-index: 3;
+
+  min-width: 125px;
+
+  padding: 14px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 4px;
+
+  border: 1px solid #dce7f7;
+
+  border-radius: 13px;
+
+  background: rgba(255, 255, 255, 0.97);
+
+  box-shadow: 0 15px 35px rgba(15, 45, 80, 0.12);
+
+  backdrop-filter: blur(10px);
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.home-floating-card:hover {
+  transform: translateY(-4px);
+
+  box-shadow: 0 20px 42px rgba(15, 45, 80, 0.17);
+}
+
+.home-floating-card span {
+  color: #8a96a7;
+
+  font-size: 10px;
+
+  font-weight: 600;
+}
+
+.home-floating-card strong {
+  color: #162d4a;
+
+  font-size: 18px;
+
+  font-weight: 900;
+}
+
+.home-floating-one {
+  top: 80px;
+
+  right: 4%;
+}
+
+.home-floating-two {
+  bottom: 75px;
+
+  left: 3%;
+}
+
+/* =========================================================
+   COMMON SECTIONS
+========================================================= */
+
+.home-features,
+.home-benefits {
+  padding: 90px 6%;
+}
+
+.home-features {
+  background: #ffffff;
+}
+
+.home-benefits {
+  background: linear-gradient(180deg, #f5f8fc, #f8fbff);
+}
+
+.home-section-heading {
+  width: min(700px, 100%);
+
+  margin: 0 auto 45px;
+
+  text-align: center;
+}
+
+.home-section-label {
+  color: #1264f5;
+
+  font-size: 11px;
+
+  font-weight: 800;
+
+  letter-spacing: 1.5px;
+}
+
+.home-section-heading h2 {
+  margin: 10px 0 12px;
+
+  color: #162d4a;
+
+  font-size: clamp(30px, 4vw, 42px);
+
+  line-height: 1.15;
+
+  letter-spacing: -1px;
+}
+
+.home-section-heading p {
+  margin: 0;
+
+  color: #718096;
+
+  line-height: 1.7;
+}
+
+/* =========================================================
+   FEATURE GRID
+========================================================= */
+
+.home-feature-grid {
+  width: min(1100px, 100%);
+
+  margin: auto;
+
+  display: grid;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: 20px;
+}
+
+.home-feature-card {
+  position: relative;
+
+  padding: 30px;
+
+  border: 1px solid #e2e8f0;
+
+  border-radius: 18px;
+
+  background: #ffffff;
+
+  box-shadow: 0 12px 32px rgba(20, 55, 100, 0.05);
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.home-feature-card:hover {
+  transform: translateY(-6px);
+
+  border-color: #c9ddff;
+
+  box-shadow: 0 20px 42px rgba(20, 55, 100, 0.1);
+}
+
+.home-feature-icon {
+  width: 52px;
+  height: 52px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 18px;
+
+  border: 1px solid #dce9ff;
+
+  border-radius: 14px;
+
+  background: #eaf2ff;
+
+  font-size: 24px;
+}
+
+.home-feature-card h3 {
+  margin: 0 0 9px;
+
+  color: #162d4a;
+
+  font-size: 20px;
+}
+
+.home-feature-card p {
+  min-height: 70px;
+
+  margin: 0 0 18px;
+
+  color: #718096;
+
+  line-height: 1.6;
+
+  font-size: 13px;
+}
+
+.home-feature-card a {
+  color: #1264f5;
+
+  text-decoration: none;
+
+  font-size: 13px;
+
+  font-weight: 800;
+
+  transition: color 0.2s ease;
+}
+
+.home-feature-card a:hover {
+  color: #0847b9;
+}
+
+/* =========================================================
+   BENEFITS
+========================================================= */
+
+.home-benefit-grid {
+  width: min(1100px, 100%);
+
+  margin: auto;
+
+  display: grid;
+
+  grid-template-columns: repeat(4, 1fr);
+
+  gap: 18px;
+}
+
+.home-benefit-card {
+  padding: 26px;
+
+  border: 1px solid #e2e8f0;
+
+  border-radius: 16px;
+
+  background: #ffffff;
+
+  box-shadow: 0 8px 25px rgba(20, 55, 100, 0.035);
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.home-benefit-card:hover {
+  transform: translateY(-4px);
+
+  box-shadow: 0 15px 32px rgba(20, 55, 100, 0.08);
+}
+
+.home-benefit-icon {
+  width: 48px;
+  height: 48px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 16px;
+
+  border-radius: 12px;
+
+  background: #eef5ff;
+
+  font-size: 24px;
+}
+
+.home-benefit-card h3 {
+  margin: 0 0 7px;
+
+  color: #162d4a;
+
+  font-size: 17px;
+}
+
+.home-benefit-card p {
+  margin: 0;
+
+  color: #718096;
+
+  font-size: 13px;
+
+  line-height: 1.6;
+}
+
+/* =========================================================
+   CTA
+========================================================= */
+
+.home-cta {
+  position: relative;
+
+  padding: 90px 24px;
+
+  overflow: hidden;
+
+  color: #ffffff;
+
+  background:
+    radial-gradient(
+      circle at 80% 20%,
+      rgba(255, 255, 255, 0.14),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 10% 90%,
+      rgba(255, 255, 255, 0.08),
+      transparent 25%
+    ),
+    linear-gradient(135deg, #0b3d91, #1264f5);
+}
+
+.home-cta-container {
+  position: relative;
+  z-index: 2;
+
+  width: min(850px, 92%);
+
+  margin: auto;
+
+  text-align: center;
+}
+
+.home-cta-container .home-section-label {
+  color: #dbe8ff;
+}
+
+.home-cta h2 {
+  margin: 14px 0 12px;
+
+  font-size: clamp(32px, 4vw, 46px);
+
+  line-height: 1.1;
+
+  letter-spacing: -1px;
+}
+
+.home-cta p {
+  max-width: 650px;
+
+  margin: 0 auto 27px;
+
+  color: #dce8ff;
+
+  line-height: 1.7;
+}
+
+.home-cta-button {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  min-height: 48px;
+
+  padding: 0 22px;
+
+  border-radius: 10px;
+
+  color: #1264f5;
+
+  background: #ffffff;
+
+  text-decoration: none;
+
+  font-size: 13px;
+
+  font-weight: 800;
+
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.13);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.home-cta-button:hover {
+  transform: translateY(-3px);
+
+  box-shadow: 0 17px 32px rgba(0, 0, 0, 0.18);
+
+  background: #f8fbff;
+}
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.home-footer {
+  background: #071529;
+
+  color: #ffffff;
+}
+
+.home-footer-content {
+  width: min(1100px, 92%);
+
+  margin: auto;
+
+  padding: 55px 0 40px;
+
+  display: grid;
+
+  grid-template-columns: 1.6fr 1fr 1fr;
+
+  gap: 45px;
+}
+
+.home-footer-logo {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 9px;
+
+  color: #ffffff;
+
+  text-decoration: none;
+
+  font-size: 20px;
+
+  font-weight: 800;
+}
+
+.home-footer-logo span {
+  width: 35px;
+  height: 35px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 9px;
+
+  color: #1264f5;
+
+  background: #ffffff;
+
+  font-weight: 900;
+}
+
+.home-footer-brand p {
+  max-width: 400px;
+
+  margin: 16px 0 0;
+
+  color: #9fb0c8;
+
+  font-size: 13px;
+
+  line-height: 1.7;
+}
+
+.home-footer-column {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 10px;
+}
+
+.home-footer-column h4 {
+  margin: 0 0 7px;
+
+  color: #ffffff;
+
+  font-size: 13px;
+}
+
+.home-footer-column a {
+  color: #9fb0c8;
+
+  text-decoration: none;
+
+  font-size: 12px;
+
+  transition: color 0.2s ease;
+}
+
+.home-footer-column a:hover {
+  color: #ffffff;
+}
+
+.home-footer-bottom {
+  padding: 18px 20px;
+
+  text-align: center;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+
+  color: #7f90a8;
+
+  font-size: 11px;
+}
+
+/* =========================================================
+   DARK MODE
+========================================================= */
+
+[data-theme="dark"] .home-page {
+  background: #0b1220;
+}
+
+[data-theme="dark"] .home-hero {
+  background:
+    radial-gradient(
+      circle at 80% 30%,
+      rgba(37, 99, 235, 0.18),
+      transparent 30%
+    ),
+    linear-gradient(180deg, #0f172a 0%, #0b1220 100%);
+}
+
+[data-theme="dark"] .home-badge {
+  color: #60a5fa;
+
+  background: #172033;
+
+  border-color: #334155;
+}
+
+[data-theme="dark"] .home-hero h1,
+[data-theme="dark"] .home-stat strong,
+[data-theme="dark"] .home-feature-card h3,
+[data-theme="dark"] .home-benefit-card h3,
+[data-theme="dark"] .home-floating-card strong,
+[data-theme="dark"] .home-section-heading h2 {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .home-hero p,
+[data-theme="dark"] .home-stat span,
+[data-theme="dark"] .home-feature-card p,
+[data-theme="dark"] .home-benefit-card p,
+[data-theme="dark"] .home-section-heading p {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .home-secondary-button,
+[data-theme="dark"] .home-floating-card {
+  background: #111827;
+
+  border-color: #334155;
+
+  color: #60a5fa;
+}
+
+[data-theme="dark"] .home-secondary-button:hover {
+  background: #172033;
+}
+
+[data-theme="dark"] .home-features {
+  background: #0b1220;
+}
+
+[data-theme="dark"] .home-benefits {
+  background: #0f172a;
+}
+
+[data-theme="dark"] .home-feature-card,
+[data-theme="dark"] .home-benefit-card {
+  background: #111827;
+
+  border-color: #243244;
+}
+
+[data-theme="dark"] .home-feature-card:hover,
+[data-theme="dark"] .home-benefit-card:hover {
+  border-color: #365276;
+}
+
+[data-theme="dark"] .home-feature-icon,
+[data-theme="dark"] .home-benefit-icon {
+  background: #172033;
+
+  border-color: #263c59;
+}
+
+[data-theme="dark"] .home-floating-card span {
+  color: #94a3b8;
+}
+
+/* =========================================================
+   LARGE TABLET
+========================================================= */
+
+@media (max-width: 1050px) {
+  .home-hero {
+    grid-template-columns: 1fr;
+
+    padding-top: 60px;
+  }
+
+  .home-hero-content {
+    margin: auto;
+
+    text-align: center;
+  }
+
+  .home-hero p {
+    margin: auto;
+  }
+
+  .home-actions,
+  .home-stats {
+    justify-content: center;
+  }
+
+  .home-card-area {
+    min-height: 430px;
+  }
+
+  .home-feature-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .home-benefit-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* =========================================================
+   TABLET / MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+  .home-hero {
+    padding: 45px 18px 65px;
+  }
+
+  .home-hero h1 {
+    font-size: 42px;
+
+    letter-spacing: -1.8px;
+  }
+
+  .home-hero p {
+    font-size: 15px;
+  }
+
+  .home-stats {
+    gap: 22px;
+  }
+
+  .home-card-area {
+    min-height: 360px;
+  }
+
+  .home-credit-card {
+    min-height: 235px;
+
+    padding: 22px;
+
+    border-radius: 20px;
+  }
+
+  .home-credit-card-number {
+    font-size: 14px;
+  }
+
+  .home-floating-one {
+    top: 25px;
+
+    right: 0;
+  }
+
+  .home-floating-two {
+    bottom: 25px;
+
+    left: 0;
+  }
+
+  .home-features,
+  .home-benefits {
+    padding: 65px 18px;
+  }
+
+  .home-feature-grid,
+  .home-benefit-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .home-section-heading h2 {
+    font-size: 30px;
+  }
+
+  .home-footer-content {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .home-footer-brand {
+    grid-column: 1 / -1;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+  .home-hero {
+    min-height: auto;
+
+    padding: 35px 16px 55px;
+  }
+
+  .home-hero-content {
+    width: 100%;
+  }
+
+  .home-hero h1 {
+    font-size: clamp(36px, 10vw, 48px);
+  }
+
+  .home-actions {
+    width: 100%;
+  }
+
+  .home-primary-button,
+  .home-secondary-button {
+    width: 100%;
+  }
+
+  .home-card-area {
+    min-height: 300px;
+  }
+
+  .home-credit-card {
+    width: 94%;
+
+    min-height: 205px;
+
+    padding: 20px;
+  }
+
+  .home-credit-card-number {
+    font-size: 12px;
+
+    letter-spacing: 1px;
+  }
+
+  .home-card-network {
+    right: 20px;
+
+    bottom: 20px;
+
+    font-size: 18px;
+  }
+
+  .home-floating-one {
+    right: -2px;
+
+    top: 15px;
+  }
+
+  .home-floating-two {
+    left: -2px;
+
+    bottom: 10px;
+  }
+
+  .home-feature-card,
+  .home-benefit-card {
+    padding: 22px;
+  }
+
+  .home-footer-content {
+    padding: 40px 0 30px;
+  }
+}
+
+/* =========================================================
+   VERY SMALL MOBILE
+========================================================= */
+
+@media (max-width: 400px) {
+  .home-hero h1 {
+    font-size: 35px;
+  }
+
+  .home-stats {
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 8px;
+  }
+
+  .home-stat strong {
+    font-size: 20px;
+  }
+
+  .home-stat span {
+    font-size: 8px;
+  }
+
+  .home-card-area {
+    min-height: 270px;
+  }
+
+  .home-credit-card {
+    min-height: 190px;
+
+    padding: 17px;
+
+    border-radius: 18px;
+  }
+
+  .home-card-bank {
+    width: 38px;
+    height: 38px;
+
+    font-size: 17px;
+  }
+
+  .home-credit-card-header {
+    font-size: 14px;
+  }
+
+  .home-credit-card-chip {
+    width: 43px;
+    height: 31px;
+  }
+
+  .home-credit-card-number {
+    font-size: 10px;
+  }
+
+  .home-credit-card-footer strong {
+    font-size: 8px;
+  }
+
+  .home-floating-card {
+    min-width: 90px;
+
+    padding: 9px;
+  }
+
+  .home-floating-card span {
+    font-size: 8px;
+  }
+
+  .home-floating-card strong {
+    font-size: 14px;
+  }
+
+  .home-footer-content {
+    grid-template-columns: 1fr;
+  }
+
+  .home-footer-brand {
+    grid-column: auto;
+  }
+}
+
+/* =========================================
+   CLICKABLE HOME CARDS
+========================================= */
+
+.home-feature-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #1264f5;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 800;
+  transition: 0.2s ease;
+}
+
+.home-feature-link:hover {
+  transform: translateX(4px);
+  color: #0847b9;
+}
+
+/* Benefit cards are now clickable */
+
+.home-benefit-link-card {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.home-benefit-link-card:hover {
+  transform: translateY(-5px);
+  border-color: #c7dcff;
+  box-shadow: 0 15px 35px rgba(20, 55, 100, 0.1);
+}
+
+.home-benefit-action {
+  display: inline-flex;
+  margin-top: 16px;
+  color: #1264f5;
+  font-size: 12px;
+  font-weight: 800;
+  transition: 0.2s ease;
+}
+
+.home-benefit-link-card:hover .home-benefit-action {
+  transform: translateX(4px);
+}
+
+/* Dark mode */
+
+[data-theme="dark"] .home-benefit-link-card:hover {
+  border-color: #3b82f6;
+}
+
+[data-theme="dark"] .home-feature-link,
+[data-theme="dark"] .home-benefit-action {
+  color: #60a5fa;
+}

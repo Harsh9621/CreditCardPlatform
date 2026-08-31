@@ -1,0 +1,290 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Arial,
+    sans-serif;
+
+  color: #172033;
+  background: #f7faff;
+
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+ul {
+  list-style: none;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* =========================================
+   CARDWISE THEME VARIABLES
+========================================= */
+
+:root {
+  --cw-bg: #ffffff;
+  --cw-surface: #ffffff;
+  --cw-surface-soft: #f5f8ff;
+  --cw-text: #172033;
+  --cw-heading: #162d4a;
+  --cw-muted: #64748b;
+  --cw-border: #e2e8f0;
+  --cw-input: #fbfdff;
+  --cw-blue: #1264f5;
+}
+
+[data-theme="dark"] {
+  --cw-bg: #0b1220;
+  --cw-surface: #111827;
+  --cw-surface-soft: #0f172a;
+  --cw-text: #e5e7eb;
+  --cw-heading: #f8fafc;
+  --cw-muted: #94a3b8;
+  --cw-border: #243244;
+  --cw-input: #0f172a;
+  --cw-blue: #4f8cff;
+}
+
+[data-theme="dark"] body {
+  background: var(--cw-bg);
+  color: var(--cw-text);
+}
+
+/* NAVBAR */
+
+[data-theme="dark"] .navbar {
+  background: rgba(15, 23, 42, 0.96);
+  border-color: #243244;
+}
+
+[data-theme="dark"] .navbar-logo {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .navbar-links a {
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .navbar-links a:hover {
+  color: #60a5fa;
+}
+
+[data-theme="dark"] .welcome-text {
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .login-btn {
+  color: #60a5fa;
+  border-color: #334155;
+  background: transparent;
+}
+
+[data-theme="dark"] .login-btn:hover {
+  background: #172033;
+}
+
+[data-theme="dark"] .logout-btn,
+[data-theme="dark"] .theme-toggle {
+  color: #e2e8f0;
+  background: #172033;
+  border-color: #334155;
+}
+
+/* MAIN PAGE BACKGROUNDS */
+
+[data-theme="dark"] .home-page,
+[data-theme="dark"] .cards-page,
+[data-theme="dark"] .applications-page,
+[data-theme="dark"] .admin-dashboard,
+[data-theme="dark"] .login-page,
+[data-theme="dark"] .register-page,
+[data-theme="dark"] .contact-page {
+  background: #0b1220;
+}
+
+/* WHITE SECTIONS */
+
+[data-theme="dark"] .why-section {
+  background: #0b1220;
+}
+
+[data-theme="dark"] .benefits-section {
+  background: #0f172a;
+}
+
+/* HEADINGS + TEXT */
+
+[data-theme="dark"] .section-heading h2,
+[data-theme="dark"] .feature-card h3,
+[data-theme="dark"] .benefits-content h2,
+[data-theme="dark"] .cta-container h2,
+[data-theme="dark"] .cards-heading h2,
+[data-theme="dark"] .credit-card-item h3,
+[data-theme="dark"] .application-title-row h3,
+[data-theme="dark"] .applications-heading h2,
+[data-theme="dark"] .applications-empty h2,
+[data-theme="dark"] .admin-heading h2,
+[data-theme="dark"] .admin-panel-header h3,
+[data-theme="dark"] .admin-topbar-left h2 {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .section-heading p,
+[data-theme="dark"] .feature-card p,
+[data-theme="dark"] .benefits-content > p,
+[data-theme="dark"] .cards-heading p,
+[data-theme="dark"] .bank-name,
+[data-theme="dark"] .info-box p,
+[data-theme="dark"] .applications-heading p,
+[data-theme="dark"] .applications-empty p,
+[data-theme="dark"] .admin-panel-header p,
+[data-theme="dark"] .admin-topbar-left p {
+  color: #94a3b8;
+}
+
+/* FEATURE CARDS */
+
+[data-theme="dark"] .feature-card,
+[data-theme="dark"] .visual-card,
+[data-theme="dark"] .credit-card-item,
+[data-theme="dark"] .applications-message,
+[data-theme="dark"] .applications-empty,
+[data-theme="dark"] .application-card,
+[data-theme="dark"] .admin-panel,
+[data-theme="dark"] .admin-card-form,
+[data-theme="dark"] .admin-card-row,
+[data-theme="dark"] .applications-error-card,
+[data-theme="dark"] .login-card,
+[data-theme="dark"] .register-card,
+[data-theme="dark"] .contact-card {
+  background: #111827;
+  border-color: #243244;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.22);
+}
+
+/* CARDS */
+
+[data-theme="dark"] .card-details,
+[data-theme="dark"] .application-info-grid {
+  border-color: #243244;
+}
+
+[data-theme="dark"] .detail-item,
+[data-theme="dark"] .reward-box,
+[data-theme="dark"] .application-benefits,
+[data-theme="dark"] .application-status-message,
+[data-theme="dark"] .admin-card-meta {
+  background: #0f172a;
+}
+
+[data-theme="dark"] .detail-item strong,
+[data-theme="dark"] .reward-box strong,
+[data-theme="dark"] .application-info-grid strong,
+[data-theme="dark"] .admin-card-info h3,
+[data-theme="dark"] .admin-card-meta strong {
+  color: #e5e7eb;
+}
+
+/* FORMS */
+
+[data-theme="dark"] .input-group input,
+[data-theme="dark"] .register-input-group input,
+[data-theme="dark"] .form-group input,
+[data-theme="dark"] .form-group select,
+[data-theme="dark"] .form-group textarea {
+  color: #f8fafc;
+  background: #0f172a;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .input-group label,
+[data-theme="dark"] .register-input-group label,
+[data-theme="dark"] .form-group label {
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .login-heading h2,
+[data-theme="dark"] .register-heading h2 {
+  color: #f8fafc;
+}
+
+/* ADMIN */
+
+[data-theme="dark"] .admin-section {
+  background: #0b1220;
+}
+
+[data-theme="dark"] .admin-badge,
+[data-theme="dark"] .admin-card-count {
+  background: #172033;
+  color: #60a5fa;
+  border-color: #334155;
+}
+
+/* APPLICATION STATUS */
+
+[data-theme="dark"] .application-status.pending {
+  color: #fbbf24;
+  background: #3a2d08;
+}
+
+[data-theme="dark"] .application-status.approved {
+  color: #4ade80;
+  background: #0c3020;
+}
+
+[data-theme="dark"] .application-status.rejected {
+  color: #f87171;
+  background: #3a1515;
+}
+
+/* CONTACT */
+
+[data-theme="dark"] .contact-label,
+[data-theme="dark"] .contact-method span {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .contact-method strong,
+[data-theme="dark"] .contact-heading h1,
+[data-theme="dark"] .contact-card h3 {
+  color: #f8fafc;
+}
