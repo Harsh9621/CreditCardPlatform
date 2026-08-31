@@ -1,13 +1,18 @@
-# Environment configuration
-src/main/resources/application.properties
-
 # Build
+
 target/
 
 # IDE
+
 .idea/
 .vscode/
 *.iml
 
 # Logs
+
 *.log
+
+# OS
+
+.DS_Store
+Thumbs.db
