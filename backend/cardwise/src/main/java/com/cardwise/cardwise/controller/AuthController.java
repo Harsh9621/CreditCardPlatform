@@ -12,7 +12,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = {
+        "http://localhost:5173",
+        "https://credit-card-platform-silk.vercel.app"
+})
 public class AuthController {
 
     private final UserService userService;
@@ -35,6 +38,10 @@ public class AuthController {
             @RequestBody User user) {
 
         try {
+
+            // -------------------------------------------------
+            // VALIDATION
+            // -------------------------------------------------
 
             if (user.getName() == null ||
                     user.getName().isBlank()) {
@@ -69,8 +76,16 @@ public class AuthController {
                         ));
             }
 
+            // -------------------------------------------------
+            // REGISTER USER
+            // -------------------------------------------------
+
             User savedUser =
                     userService.registerUser(user);
+
+            // -------------------------------------------------
+            // RESPONSE
+            // -------------------------------------------------
 
             return ResponseEntity.ok(
                     Map.of(
@@ -151,6 +166,10 @@ public class AuthController {
                                 "Password is required"
                         ));
             }
+
+            // -------------------------------------------------
+            // NORMALIZE EMAIL
+            // -------------------------------------------------
 
             String email =
                     user.getEmail()
@@ -269,10 +288,11 @@ public class AuthController {
             System.out.println(
                     "================================="
             );
+
             System.out.println();
 
             // -------------------------------------------------
-            // RESPONSE
+            // LOGIN RESPONSE
             // -------------------------------------------------
 
             return ResponseEntity.ok(
@@ -325,86 +345,6 @@ public class AuthController {
                             Map.of(
                                     "message",
                                     "Login failed. Please try again."
-                            )
-                    );
-        }
-    }
-
-    // =====================================================
-    // RESET ADMIN PASSWORD
-    // =====================================================
-
-    @GetMapping("/reset-admin")
-    public ResponseEntity<?> resetAdminPassword() {
-
-        try {
-
-            userService.resetAdminPassword();
-
-            return ResponseEntity.ok(
-                    Map.of(
-                            "message",
-                            "Admin password reset successfully",
-
-                            "email",
-                            "admin@cardwise.com",
-
-                            "password",
-                            "Admin@123"
-                    )
-            );
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-
-            return ResponseEntity
-                    .badRequest()
-                    .body(
-                            Map.of(
-                                    "message",
-                                    e.getMessage() != null
-                                            ? e.getMessage()
-                                            : "Admin password reset failed"
-                            )
-                    );
-        }
-    }
-
-    // =====================================================
-    // TEST ADMIN PASSWORD
-    // =====================================================
-
-    @GetMapping("/test-admin-password")
-    public ResponseEntity<?> testAdminPassword() {
-
-        try {
-
-            boolean matches =
-                    userService.testAdminPassword();
-
-            return ResponseEntity.ok(
-                    Map.of(
-                            "email",
-                            "admin@cardwise.com",
-
-                            "passwordMatches",
-                            matches
-                    )
-            );
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-
-            return ResponseEntity
-                    .badRequest()
-                    .body(
-                            Map.of(
-                                    "message",
-                                    e.getMessage() != null
-                                            ? e.getMessage()
-                                            : "Password test failed"
                             )
                     );
         }
