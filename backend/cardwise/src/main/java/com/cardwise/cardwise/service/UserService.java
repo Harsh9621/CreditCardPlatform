@@ -8,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -136,6 +137,88 @@ public class UserService {
         );
 
         return userRepository.save(user);
+    }
+
+    // =====================================================
+    // GOOGLE LOGIN / OAUTH USER
+    // =====================================================
+
+    public User findOrCreateGoogleUser(
+            String name,
+            String email) {
+
+        if (email == null || email.isBlank()) {
+
+            throw new RuntimeException(
+                    "Google account email is required"
+            );
+        }
+
+        String normalizedEmail =
+                email.trim().toLowerCase();
+
+        User existingUser =
+                findByEmail(normalizedEmail);
+
+        // =================================================
+        // EXISTING CARDWISE USER
+        // =================================================
+
+        if (existingUser != null) {
+
+            if (!existingUser.isActive()) {
+
+                throw new RuntimeException(
+                        "Your CardWise account has been blocked."
+                );
+            }
+
+            /*
+             * Do NOT change the user's existing role.
+             * This is important for ADMIN accounts.
+             */
+            return existingUser;
+        }
+
+        // =================================================
+        // CREATE NEW CARDWISE USER
+        // =================================================
+
+        User googleUser = new User();
+
+        String safeName =
+                name != null && !name.isBlank()
+                        ? name.trim()
+                        : normalizedEmail.split("@")[0];
+
+        googleUser.setName(safeName);
+        googleUser.setEmail(normalizedEmail);
+
+        /*
+         * Google users may not have a phone number yet.
+         * They can add it later from Profile.
+         */
+        googleUser.setPhone(null);
+
+        /*
+         * The database currently requires a password.
+         * Google users do not use this password for login,
+         * so create a strong random value that is never shown.
+         */
+        String randomPassword =
+                UUID.randomUUID().toString()
+                        + UUID.randomUUID();
+
+        googleUser.setPassword(
+                passwordEncoder.encode(
+                        randomPassword
+                )
+        );
+
+        googleUser.setRole(UserRole.USER);
+        googleUser.setActive(true);
+
+        return userRepository.save(googleUser);
     }
 
     // =====================================================

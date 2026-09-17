@@ -1,9 +1,6 @@
 import { useState } from "react";
-import {
-  Link,
-  useLocation,
-  useNavigate,
-} from "react-router-dom";
+
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../context/AuthContext";
 
@@ -36,14 +33,11 @@ function Login() {
       returnPath = stateFrom;
     } else if (stateFrom?.pathname) {
       returnPath =
-        stateFrom.pathname +
-        (stateFrom.search || "") +
-        (stateFrom.hash || "");
+        stateFrom.pathname + (stateFrom.search || "") + (stateFrom.hash || "");
     }
 
     if (!returnPath) {
-      returnPath =
-        sessionStorage.getItem("cardwise_return_to") || "";
+      returnPath = sessionStorage.getItem("cardwise_return_to") || "";
     }
 
     // Prevent external redirects.
@@ -77,7 +71,7 @@ function Login() {
   };
 
   // =====================================================
-  // LOGIN
+  // NORMAL LOGIN
   // =====================================================
 
   const handleLogin = async (event) => {
@@ -99,20 +93,14 @@ function Login() {
     setError("");
 
     try {
-      const result = await loginWithCredentials(
-        email,
-        password,
-      );
+      const result = await loginWithCredentials(email, password);
 
       const loggedInUser = result.user;
-
-      const role = String(
-        loggedInUser?.role || "USER",
-      ).toUpperCase();
+      const role = String(loggedInUser?.role || "USER").toUpperCase();
 
       console.log("CardWise login successful:", {
-        id: loggedInUser.id,
-        email: loggedInUser.email,
+        id: loggedInUser?.id,
+        email: loggedInUser?.email,
         role,
       });
 
@@ -121,9 +109,7 @@ function Login() {
       // ===================================================
 
       if (role === "ADMIN") {
-        sessionStorage.removeItem(
-          "cardwise_return_to",
-        );
+        sessionStorage.removeItem("cardwise_return_to");
 
         navigate("/admin", {
           replace: true,
@@ -138,9 +124,7 @@ function Login() {
 
       const returnPath = getReturnPath();
 
-      sessionStorage.removeItem(
-        "cardwise_return_to",
-      );
+      sessionStorage.removeItem("cardwise_return_to");
 
       if (returnPath) {
         navigate(returnPath, {
@@ -152,37 +136,26 @@ function Login() {
         });
       }
     } catch (err) {
-      console.error(
-        "CardWise login failed:",
-        err,
-      );
+      console.error("CardWise login failed:", err);
 
       const status = err.response?.status;
 
       const backendMessage =
-        err.response?.data?.message ||
-        err.response?.data?.error;
+        err.response?.data?.message || err.response?.data?.error;
 
       if (status === 401) {
         setError("Invalid email or password.");
       } else if (status === 403) {
-        setError(
-          "Your account does not have permission to log in.",
-        );
+        setError("Your account does not have permission to log in.");
       } else if (status === 400) {
-        setError(
-          backendMessage ||
-            "Please check your login details.",
-        );
+        setError(backendMessage || "Please check your login details.");
       } else if (!err.response) {
         setError(
           "Unable to connect to the CardWise server. Please make sure the backend is running.",
         );
       } else {
         setError(
-          backendMessage ||
-            err.message ||
-            "Unable to login. Please try again.",
+          backendMessage || err.message || "Unable to login. Please try again.",
         );
       }
     } finally {
@@ -196,6 +169,10 @@ function Login() {
 
   return (
     <main className="login-page">
+      {/* =================================================
+          BACKGROUND
+          ================================================= */}
+
       <div className="login-background" aria-hidden="true">
         <div className="login-background-grid" />
         <div className="login-background-glow login-glow-one" />
@@ -209,10 +186,7 @@ function Login() {
 
         <section className="login-intro">
           <div className="login-intro-badge">
-            <span
-              className="login-intro-badge-dot"
-              aria-hidden="true"
-            />
+            <span className="login-intro-badge-dot" aria-hidden="true" />
             SMARTER CREDIT CARD CHOICES
           </div>
 
@@ -223,57 +197,41 @@ function Login() {
           </h1>
 
           <p>
-            Sign in to CardWise to manage your credit card
-            applications, track application status, and
-            explore cards built around your needs.
+            Sign in to CardWise to manage your credit card applications, track
+            application status, and explore cards built around your needs.
           </p>
 
           <div className="login-trust-list">
             <div className="login-trust-item">
-              <span
-                className="login-trust-icon"
-                aria-hidden="true"
-              >
+              <span className="login-trust-icon" aria-hidden="true">
                 ✓
               </span>
 
               <div>
                 <strong>Simple comparison</strong>
-                <span>
-                  Understand cards before you apply.
-                </span>
+                <span>Understand cards before you apply.</span>
               </div>
             </div>
 
             <div className="login-trust-item">
-              <span
-                className="login-trust-icon"
-                aria-hidden="true"
-              >
+              <span className="login-trust-icon" aria-hidden="true">
                 ✓
               </span>
 
               <div>
                 <strong>Application tracking</strong>
-                <span>
-                  Keep your applications in one place.
-                </span>
+                <span>Keep your applications in one place.</span>
               </div>
             </div>
 
             <div className="login-trust-item">
-              <span
-                className="login-trust-icon"
-                aria-hidden="true"
-              >
+              <span className="login-trust-icon" aria-hidden="true">
                 ✓
               </span>
 
               <div>
                 <strong>Secure account access</strong>
-                <span>
-                  Your CardWise account stays protected.
-                </span>
+                <span>Your CardWise account stays protected.</span>
               </div>
             </div>
           </div>
@@ -284,6 +242,8 @@ function Login() {
             ================================================= */}
 
         <section className="login-card">
+          {/* BRAND */}
+
           <div className="login-card-top">
             <div className="login-brand-mark" aria-hidden="true">
               C
@@ -294,34 +254,24 @@ function Login() {
             </span>
           </div>
 
+          {/* HEADER */}
+
           <div className="login-header">
-            <span className="login-eyebrow">
-              WELCOME BACK
-            </span>
+            <span className="login-eyebrow">WELCOME BACK</span>
 
             <h2>Sign in to your account</h2>
 
-            <p>
-              Access your dashboard and manage your
-              CardWise applications.
-            </p>
+            <p>Access your dashboard and manage your CardWise applications.</p>
           </div>
 
-          <form
-            className="login-form"
-            onSubmit={handleLogin}
-            noValidate
-          >
+          {/* =================================================
+              EMAIL / PASSWORD FORM
+              ================================================= */}
+
+          <form className="login-form" onSubmit={handleLogin} noValidate>
             {error && (
-              <div
-                className="login-error"
-                role="alert"
-                aria-live="polite"
-              >
-                <span
-                  className="login-error-icon"
-                  aria-hidden="true"
-                >
+              <div className="login-error" role="alert" aria-live="polite">
+                <span className="login-error-icon" aria-hidden="true">
                   !
                 </span>
 
@@ -329,16 +279,13 @@ function Login() {
               </div>
             )}
 
+            {/* EMAIL */}
+
             <div className="login-form-group">
-              <label htmlFor="email">
-                Email Address
-              </label>
+              <label htmlFor="email">Email Address</label>
 
               <div className="login-input-wrapper">
-                <span
-                  className="login-input-icon"
-                  aria-hidden="true"
-                >
+                <span className="login-input-icon" aria-hidden="true">
                   @
                 </span>
 
@@ -358,25 +305,19 @@ function Login() {
               </div>
             </div>
 
+            {/* PASSWORD */}
+
             <div className="login-form-group">
               <div className="login-label-row">
-                <label htmlFor="password">
-                  Password
-                </label>
+                <label htmlFor="password">Password</label>
 
-                <Link
-                  to="/forgot-password"
-                  className="login-forgot"
-                >
+                <Link to="/forgot-password" className="login-forgot">
                   Forgot Password?
                 </Link>
               </div>
 
               <div className="login-input-wrapper">
-                <span
-                  className="login-input-icon"
-                  aria-hidden="true"
-                >
+                <span className="login-input-icon" aria-hidden="true">
                   •••
                 </span>
 
@@ -394,26 +335,18 @@ function Login() {
               </div>
             </div>
 
-            <button
-              type="submit"
-              className="login-submit"
-              disabled={loading}
-            >
+            {/* SIGN IN */}
+
+            <button type="submit" className="login-submit" disabled={loading}>
               {loading ? (
                 <>
-                  <span
-                    className="login-submit-spinner"
-                    aria-hidden="true"
-                  />
+                  <span className="login-submit-spinner" aria-hidden="true" />
                   Signing in...
                 </>
               ) : (
                 <>
                   Sign In
-                  <span
-                    className="login-submit-arrow"
-                    aria-hidden="true"
-                  >
+                  <span className="login-submit-arrow" aria-hidden="true">
                     →
                   </span>
                 </>
@@ -421,24 +354,24 @@ function Login() {
             </button>
           </form>
 
-          <div className="login-divider">
-            <span>OR</span>
-          </div>
+          {/* =================================================
+              REGISTER
+              ================================================= */}
 
           <div className="login-register">
             <span>Don't have an account?</span>
 
-            <Link to="/register">
-              Create Account
-            </Link>
+            <Link to="/register">Create Account</Link>
           </div>
+
+          {/* =================================================
+              SECURITY
+              ================================================= */}
 
           <div className="login-security-note">
             <span aria-hidden="true">🔒</span>
-            <span>
-              Your connection and account information are
-              protected.
-            </span>
+
+            <span>Your connection and account information are protected.</span>
           </div>
         </section>
       </div>

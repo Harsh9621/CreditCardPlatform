@@ -19,12 +19,23 @@ public class AdminSeeder {
     @Value("${ADMIN_PASSWORD:}")
     private String adminPassword;
 
+    // Explicit development-only password reset flag
+    @Value("${ADMIN_RESET_PASSWORD:false}")
+    private boolean resetAdminPassword;
+
     @Bean
     CommandLineRunner createAdminUser(
             UserRepository userRepository,
             PasswordEncoder passwordEncoder) {
 
         return args -> {
+
+            // =================================================
+            // NORMALIZE ADMIN EMAIL
+            // =================================================
+
+            String normalizedEmail =
+                    adminEmail.trim().toLowerCase();
 
             // =================================================
             // CHECK ADMIN PASSWORD
@@ -42,54 +53,79 @@ public class AdminSeeder {
             }
 
             // =================================================
-            // CHECK EXISTING ADMIN
+            // FIND EXISTING USER
             // =================================================
 
-            String normalizedEmail =
-                    adminEmail.trim().toLowerCase();
+            User existingUser =
+                    userRepository.findByEmail(normalizedEmail)
+                            .orElse(null);
 
-            if (userRepository.existsByEmail(
-                    normalizedEmail)) {
+            // =================================================
+            // ADMIN DOES NOT EXIST → CREATE
+            // =================================================
+
+            if (existingUser == null) {
+
+                User admin = new User();
+
+                admin.setName("CardWise Admin");
+                admin.setEmail(normalizedEmail);
+
+                admin.setPassword(
+                        passwordEncoder.encode(adminPassword)
+                );
+
+                admin.setRole(UserRole.ADMIN);
+                admin.setActive(true);
+
+                userRepository.save(admin);
 
                 System.out.println(
-                        "CardWise ADMIN already exists."
+                        "CardWise ADMIN account created successfully."
                 );
 
                 return;
             }
 
             // =================================================
-            // CREATE ADMIN
+            // ADMIN EXISTS → OPTIONAL PASSWORD RESET
             // =================================================
 
-            User admin = new User();
+            if (resetAdminPassword) {
 
-            admin.setName("CardWise Admin");
+                // Safety check: only modify an existing ADMIN
+                if (existingUser.getRole() != UserRole.ADMIN) {
 
-            admin.setEmail(
-                    normalizedEmail
-            );
+                    System.out.println(
+                            "CardWise ADMIN password reset skipped: " +
+                            "existing account is not an ADMIN."
+                    );
 
-            admin.setPassword(
-                    passwordEncoder.encode(
-                            adminPassword
-                    )
-            );
+                    return;
+                }
 
-            admin.setRole(
-                    UserRole.ADMIN
-            );
+                existingUser.setPassword(
+                        passwordEncoder.encode(adminPassword)
+                );
 
-            admin.setActive(true);
+                existingUser.setActive(true);
 
-            userRepository.save(admin);
+                userRepository.save(existingUser);
+
+                System.out.println(
+                        "CardWise ADMIN password reset successfully."
+                );
+
+                return;
+            }
 
             // =================================================
-            // SUCCESS MESSAGE
+            // EXISTING ADMIN → NO CHANGE
             // =================================================
 
             System.out.println(
-                    "CardWise ADMIN account created successfully."
+                    "CardWise ADMIN already exists. " +
+                    "No changes made."
             );
         };
     }

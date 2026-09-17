@@ -80,6 +80,33 @@ export function AuthProvider({ children }) {
   }, []);
 
   // ===================================================
+  // HANDLE GOOGLE / STORAGE AUTH CHANGE
+  // ===================================================
+
+  useEffect(() => {
+    const handleAuthChanged = () => {
+      console.log("CardWise: authentication state changed.");
+
+      const savedToken = getStoredToken();
+      const savedUser = getStoredUser();
+
+      if (savedToken && savedUser) {
+        setToken(savedToken);
+        setUser(savedUser);
+      } else {
+        setToken(null);
+        setUser(null);
+      }
+    };
+
+    window.addEventListener("cardwise-auth-changed", handleAuthChanged);
+
+    return () => {
+      window.removeEventListener("cardwise-auth-changed", handleAuthChanged);
+    };
+  }, []);
+
+  // ===================================================
   // HANDLE EXPIRED TOKEN
   // ===================================================
 
@@ -117,10 +144,13 @@ export function AuthProvider({ children }) {
     }
 
     localStorage.setItem("token", newToken);
+
     localStorage.setItem("user", JSON.stringify(newUser));
 
     setToken(newToken);
     setUser(newUser);
+
+    window.dispatchEvent(new Event("cardwise-auth-changed"));
   }, []);
 
   // ===================================================
@@ -139,7 +169,8 @@ export function AuthProvider({ children }) {
         throw new Error("Password is required.");
       }
 
-      // Remove any old token before starting a fresh login.
+      // Remove any old token before
+      // starting a fresh login.
       localStorage.removeItem("token");
 
       const response = await api.post("/auth/login", {
@@ -195,6 +226,8 @@ export function AuthProvider({ children }) {
 
     setToken(null);
     setUser(null);
+
+    window.dispatchEvent(new Event("cardwise-auth-changed"));
   }, []);
 
   // ===================================================
@@ -209,6 +242,8 @@ export function AuthProvider({ children }) {
     localStorage.setItem("user", JSON.stringify(updatedUser));
 
     setUser(updatedUser);
+
+    window.dispatchEvent(new Event("cardwise-auth-changed"));
   }, []);
 
   // ===================================================

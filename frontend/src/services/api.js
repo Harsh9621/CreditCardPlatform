@@ -1,7 +1,11 @@
 import axios from "axios";
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
+const configuredApiUrl = import.meta.env.VITE_API_BASE_URL;
+
+const API_BASE_URL = (configuredApiUrl || "http://localhost:8080/api").replace(
+  /\/+$/,
+  "",
+);
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -17,7 +21,6 @@ api.interceptors.request.use(
     const token = localStorage.getItem("token");
 
     config.headers = config.headers || {};
-
     config.headers.Accept = "application/json";
 
     if (token && token.trim()) {
@@ -66,16 +69,10 @@ api.interceptors.response.use(
     // ONLY CLEAR SESSION FOR REAL AUTHENTICATION FAILURE
     // ==========================================================
 
-    if (
-      status === 401 &&
-      !isAuthRequest &&
-      !window.__cardwiseAuthHandling
-    ) {
+    if (status === 401 && !isAuthRequest && !window.__cardwiseAuthHandling) {
       window.__cardwiseAuthHandling = true;
 
-      console.warn(
-        "CardWise authentication failed. Clearing local session.",
-      );
+      console.warn("CardWise authentication failed. Clearing local session.");
 
       const currentPath =
         window.location.pathname +
@@ -89,23 +86,22 @@ api.interceptors.response.use(
         currentPath === "/forgot-password";
 
       if (!isPublicPage) {
-        sessionStorage.setItem(
-          "cardwise_return_to",
-          currentPath,
-        );
+        sessionStorage.setItem("cardwise_return_to", currentPath);
       }
 
       localStorage.removeItem("token");
       localStorage.removeItem("user");
 
-      window.dispatchEvent(
-        new Event("cardwise-auth-expired"),
-      );
+      window.dispatchEvent(new Event("cardwise-auth-expired"));
 
       setTimeout(() => {
         window.__cardwiseAuthHandling = false;
       }, 1000);
     }
+
+    // ==========================================================
+    // CONFLICT
+    // ==========================================================
 
     if (status === 409) {
       console.warn(
@@ -115,6 +111,10 @@ api.interceptors.response.use(
           "The request conflicts with existing data.",
       );
     }
+
+    // ==========================================================
+    // SERVER ERROR
+    // ==========================================================
 
     if (status >= 500) {
       console.error(

@@ -31,7 +31,7 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtFilter;
     private final RateLimitFilter rateLimitFilter;
 
-    @Value("${CARDWISE_ALLOWED_ORIGINS:http://localhost:5173}")
+    @Value("${app.cors.allowed-origins:http://localhost:5173}")
     private String allowedOrigins;
 
     public SecurityConfig(
@@ -48,22 +48,29 @@ public class SecurityConfig {
     ) throws Exception {
 
         http
+
                 // =====================================================
                 // CORS
                 // =====================================================
 
-                .cors(cors -> cors.configurationSource(
-                        corsConfigurationSource()
-                ))
+                .cors(cors ->
+                        cors.configurationSource(
+                                corsConfigurationSource()
+                        )
+                )
 
                 // =====================================================
                 // CSRF
                 // =====================================================
 
-                .csrf(csrf -> csrf.disable())
+                .csrf(csrf ->
+                        csrf.disable()
+                )
 
                 // =====================================================
-                // STATELESS JWT
+                // SESSION
+                // =====================================================
+                // CardWise uses JWT authentication.
                 // =====================================================
 
                 .sessionManagement(session ->
@@ -112,6 +119,7 @@ public class SecurityConfig {
                                 "/actuator/health",
                                 "/actuator/health/**",
                                 "/api/auth/**",
+
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/api-docs/**",
@@ -185,20 +193,17 @@ public class SecurityConfig {
                 )
 
                 // =====================================================
-                // IMPORTANT FILTER ORDER
-                // =====================================================
-                //
-                // JWT MUST RUN FIRST.
-                //
-                // This ensures RateLimitFilter can see an authenticated
-                // user when required.
-                //
+                // JWT FILTER
                 // =====================================================
 
                 .addFilterBefore(
                         jwtFilter,
                         UsernamePasswordAuthenticationFilter.class
                 )
+
+                // =====================================================
+                // RATE LIMIT FILTER
+                // =====================================================
 
                 .addFilterAfter(
                         rateLimitFilter,
@@ -229,7 +234,9 @@ public class SecurityConfig {
                     "application/json"
             );
 
-            response.setCharacterEncoding("UTF-8");
+            response.setCharacterEncoding(
+                    "UTF-8"
+            );
 
             response.getWriter().write(
                     "{\"message\":\"Authentication required.\"}"
@@ -258,7 +265,9 @@ public class SecurityConfig {
                     "application/json"
             );
 
-            response.setCharacterEncoding("UTF-8");
+            response.setCharacterEncoding(
+                    "UTF-8"
+            );
 
             response.getWriter().write(
                     "{\"message\":\"Access denied.\"}"
@@ -308,7 +317,9 @@ public class SecurityConfig {
         );
 
         config.setExposedHeaders(
-                List.of("Authorization")
+                List.of(
+                        "Authorization"
+                )
         );
 
         config.setAllowCredentials(true);
