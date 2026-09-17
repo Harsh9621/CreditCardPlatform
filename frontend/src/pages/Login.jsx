@@ -1,17 +1,80 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import {
+  Link,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
+
 import { useAuth } from "../context/AuthContext";
-import api from "../services/api";
+
 import "./Login.css";
 
 function Login() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const location = useLocation();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const { loginWithCredentials } = useAuth();
+
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  // =====================================================
+  // RETURN PATH
+  // =====================================================
+
+  const getReturnPath = () => {
+    const stateFrom = location.state?.from;
+
+    let returnPath = "";
+
+    if (typeof stateFrom === "string") {
+      returnPath = stateFrom;
+    } else if (stateFrom?.pathname) {
+      returnPath =
+        stateFrom.pathname +
+        (stateFrom.search || "") +
+        (stateFrom.hash || "");
+    }
+
+    if (!returnPath) {
+      returnPath =
+        sessionStorage.getItem("cardwise_return_to") || "";
+    }
+
+    // Prevent external redirects.
+    if (
+      !returnPath.startsWith("/") ||
+      returnPath.startsWith("//") ||
+      returnPath === "/login" ||
+      returnPath === "/register"
+    ) {
+      return "";
+    }
+
+    return returnPath;
+  };
+
+  // =====================================================
+  // INPUT HANDLING
+  // =====================================================
+
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+
+    setFormData((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
+
+    if (error) {
+      setError("");
+    }
+  };
 
   // =====================================================
   // LOGIN
@@ -20,280 +83,366 @@ function Login() {
   const handleLogin = async (event) => {
     event.preventDefault();
 
+    if (loading) {
+      return;
+    }
+
+    const email = formData.email.trim();
+    const password = formData.password;
+
+    if (!email || !password) {
+      setError("Please enter your email and password.");
+      return;
+    }
+
+    setLoading(true);
     setError("");
 
-    const cleanEmail = email.trim();
-
-    // ===================================================
-    // FRONTEND VALIDATION
-    // ===================================================
-
-    if (!cleanEmail) {
-      setError("Please enter your email address.");
-      return;
-    }
-
-    if (!password) {
-      setError("Please enter your password.");
-      return;
-    }
-
-    // FIXED EMAIL REGEX
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!emailPattern.test(cleanEmail)) {
-      setError("Please enter a valid email address.");
-      return;
-    }
-
     try {
-      setLoading(true);
+      const result = await loginWithCredentials(
+        email,
+        password,
+      );
 
-      // =================================================
-      // LOGIN API
-      // =================================================
+      const loggedInUser = result.user;
 
-      console.log("Sending login request:", {
-        email: cleanEmail,
+      const role = String(
+        loggedInUser?.role || "USER",
+      ).toUpperCase();
+
+      console.log("CardWise login successful:", {
+        id: loggedInUser.id,
+        email: loggedInUser.email,
+        role,
       });
 
-      const response = await api.post("/auth/login", {
-        email: cleanEmail,
-        password: password,
-      });
+      // ===================================================
+      // ADMIN REDIRECT
+      // ===================================================
 
-      console.log("Login response:", response.data);
+      if (role === "ADMIN") {
+        sessionStorage.removeItem(
+          "cardwise_return_to",
+        );
 
-      const data = response.data;
-
-      // =================================================
-      // GET TOKEN
-      // =================================================
-
-      const token = data?.token;
-
-      if (!token) {
-        setError("Login failed. Authentication token was not received.");
-        return;
-      }
-
-      // =================================================
-      // CREATE USER OBJECT
-      // =================================================
-
-      const user = {
-        id: data?.id,
-        name: data?.name,
-        email: data?.email || cleanEmail,
-        role: String(data?.role || "USER").toUpperCase(),
-      };
-
-      console.log("Authenticated user:", user);
-
-      // =================================================
-      // SAVE AUTHENTICATION
-      // =================================================
-
-      login(token, user);
-
-      // =================================================
-      // ROLE BASED REDIRECT
-      // =================================================
-
-      if (user.role === "ADMIN") {
         navigate("/admin", {
           replace: true,
         });
+
+        return;
+      }
+
+      // ===================================================
+      // CUSTOMER REDIRECT
+      // ===================================================
+
+      const returnPath = getReturnPath();
+
+      sessionStorage.removeItem(
+        "cardwise_return_to",
+      );
+
+      if (returnPath) {
+        navigate(returnPath, {
+          replace: true,
+        });
       } else {
-        navigate("/", {
+        navigate("/dashboard", {
           replace: true,
         });
       }
-    } catch (error) {
-      console.error("Login error:", error);
+    } catch (err) {
+      console.error(
+        "CardWise login failed:",
+        err,
+      );
 
-      const status = error.response?.status;
+      const status = err.response?.status;
 
       const backendMessage =
-        error.response?.data?.message ||
-        (typeof error.response?.data === "string" ? error.response.data : "");
+        err.response?.data?.message ||
+        err.response?.data?.error;
 
-      console.error("Login status:", status);
-
-      console.error("Login backend response:", error.response?.data);
-
-      // =================================================
-      // ERROR HANDLING
-      // =================================================
-
-      if (status === 400) {
-        setError(
-          backendMessage ||
-            "Invalid login request. Please check your email and password.",
-        );
-      } else if (status === 401) {
-        setError(backendMessage || "Invalid email or password.");
+      if (status === 401) {
+        setError("Invalid email or password.");
       } else if (status === 403) {
         setError(
-          backendMessage || "Your account does not have permission to login.",
+          "Your account does not have permission to log in.",
         );
-      } else if (status === 404) {
-        setError("Login service was not found. Please check the backend.");
-      } else if (status >= 500) {
+      } else if (status === 400) {
         setError(
-          "Server error. Please make sure the CardWise backend is running.",
+          backendMessage ||
+            "Please check your login details.",
+        );
+      } else if (!err.response) {
+        setError(
+          "Unable to connect to the CardWise server. Please make sure the backend is running.",
         );
       } else {
-        setError(backendMessage || "Unable to login. Please try again.");
+        setError(
+          backendMessage ||
+            err.message ||
+            "Unable to login. Please try again.",
+        );
       }
     } finally {
       setLoading(false);
     }
   };
 
+  // =====================================================
+  // UI
+  // =====================================================
+
   return (
-    <div className="login-page">
-      <div className="login-container">
+    <main className="login-page">
+      <div className="login-background" aria-hidden="true">
+        <div className="login-background-grid" />
+        <div className="login-background-glow login-glow-one" />
+        <div className="login-background-glow login-glow-two" />
+      </div>
+
+      <div className="login-layout">
         {/* =================================================
-            LEFT SIDE
-        ================================================= */}
+            LEFT BRAND PANEL
+            ================================================= */}
 
-        <div className="login-brand">
-          <Link to="/" className="login-brand-logo">
-            <span className="login-logo-icon">C</span>
-            CardWise
-          </Link>
+        <section className="login-intro">
+          <div className="login-intro-badge">
+            <span
+              className="login-intro-badge-dot"
+              aria-hidden="true"
+            />
+            SMARTER CREDIT CARD CHOICES
+          </div>
 
-          <div className="login-brand-content">
-            <span>SMARTER CREDIT CARD CHOICES</span>
+          <h1>
+            Your cards.
+            <span>Your choices.</span>
+            <strong>Made smarter.</strong>
+          </h1>
 
-            <h1>
-              Choose your card
-              <br />
-              with confidence.
-            </h1>
+          <p>
+            Sign in to CardWise to manage your credit card
+            applications, track application status, and
+            explore cards built around your needs.
+          </p>
 
-            <p>
-              Compare credit cards, discover rewards, and manage your
-              applications from one secure platform.
-            </p>
+          <div className="login-trust-list">
+            <div className="login-trust-item">
+              <span
+                className="login-trust-icon"
+                aria-hidden="true"
+              >
+                ✓
+              </span>
 
-            <div className="login-features">
               <div>
-                <span>✓</span>
-                Compare credit cards
+                <strong>Simple comparison</strong>
+                <span>
+                  Understand cards before you apply.
+                </span>
               </div>
+            </div>
+
+            <div className="login-trust-item">
+              <span
+                className="login-trust-icon"
+                aria-hidden="true"
+              >
+                ✓
+              </span>
 
               <div>
-                <span>✓</span>
-                Discover better rewards
+                <strong>Application tracking</strong>
+                <span>
+                  Keep your applications in one place.
+                </span>
               </div>
+            </div>
+
+            <div className="login-trust-item">
+              <span
+                className="login-trust-icon"
+                aria-hidden="true"
+              >
+                ✓
+              </span>
 
               <div>
-                <span>✓</span>
-                Track applications
+                <strong>Secure account access</strong>
+                <span>
+                  Your CardWise account stays protected.
+                </span>
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
         {/* =================================================
-            RIGHT SIDE
-        ================================================= */}
-
-        <div className="login-form-area">
-          <div className="login-card">
-            <Link to="/" className="mobile-login-logo">
-              <span className="login-logo-icon">C</span>
-              CardWise
-            </Link>
-
-            <div className="login-heading">
-              <h2>Welcome Back</h2>
-
-              <p>Login to your CardWise account.</p>
-            </div>
-
-            {/* =================================================
-                ERROR
+            LOGIN CARD
             ================================================= */}
 
+        <section className="login-card">
+          <div className="login-card-top">
+            <div className="login-brand-mark" aria-hidden="true">
+              C
+            </div>
+
+            <span className="login-brand-name">
+              Card<span>Wise</span>
+            </span>
+          </div>
+
+          <div className="login-header">
+            <span className="login-eyebrow">
+              WELCOME BACK
+            </span>
+
+            <h2>Sign in to your account</h2>
+
+            <p>
+              Access your dashboard and manage your
+              CardWise applications.
+            </p>
+          </div>
+
+          <form
+            className="login-form"
+            onSubmit={handleLogin}
+            noValidate
+          >
             {error && (
-              <div className="login-error" role="alert">
-                {error}
+              <div
+                className="login-error"
+                role="alert"
+                aria-live="polite"
+              >
+                <span
+                  className="login-error-icon"
+                  aria-hidden="true"
+                >
+                  !
+                </span>
+
+                <span>{error}</span>
               </div>
             )}
 
-            {/* =================================================
-                LOGIN FORM
-            ================================================= */}
+            <div className="login-form-group">
+              <label htmlFor="email">
+                Email Address
+              </label>
 
-            <form onSubmit={handleLogin} noValidate>
-              <div className="input-group">
-                <label htmlFor="email">Email Address</label>
+              <div className="login-input-wrapper">
+                <span
+                  className="login-input-icon"
+                  aria-hidden="true"
+                >
+                  @
+                </span>
 
                 <input
                   id="email"
+                  name="email"
                   type="email"
-                  value={email}
                   placeholder="Enter your email"
-                  onChange={(event) => setEmail(event.target.value)}
+                  value={formData.email}
+                  onChange={handleInputChange}
                   autoComplete="email"
-                  disabled={loading}
+                  autoCapitalize="none"
+                  spellCheck="false"
                   required
+                  disabled={loading}
                 />
               </div>
+            </div>
 
-              <div className="input-group">
-                <label htmlFor="password">Password</label>
+            <div className="login-form-group">
+              <div className="login-label-row">
+                <label htmlFor="password">
+                  Password
+                </label>
+
+                <Link
+                  to="/forgot-password"
+                  className="login-forgot"
+                >
+                  Forgot Password?
+                </Link>
+              </div>
+
+              <div className="login-input-wrapper">
+                <span
+                  className="login-input-icon"
+                  aria-hidden="true"
+                >
+                  •••
+                </span>
 
                 <input
                   id="password"
+                  name="password"
                   type="password"
-                  value={password}
                   placeholder="Enter your password"
-                  onChange={(event) => setPassword(event.target.value)}
+                  value={formData.password}
+                  onChange={handleInputChange}
                   autoComplete="current-password"
-                  disabled={loading}
                   required
+                  disabled={loading}
                 />
               </div>
-
-              <button type="submit" className="login-submit" disabled={loading}>
-                {loading ? (
-                  <>
-                    <span className="login-spinner"></span>
-                    Logging in...
-                  </>
-                ) : (
-                  "Login"
-                )}
-              </button>
-            </form>
-
-            {/* =================================================
-                REGISTER
-            ================================================= */}
-
-            <div className="login-divider">
-              <span></span>
-
-              <p>New to CardWise?</p>
-
-              <span></span>
             </div>
 
-            <Link to="/register" className="register-link">
-              Create a New Account
-            </Link>
+            <button
+              type="submit"
+              className="login-submit"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <span
+                    className="login-submit-spinner"
+                    aria-hidden="true"
+                  />
+                  Signing in...
+                </>
+              ) : (
+                <>
+                  Sign In
+                  <span
+                    className="login-submit-arrow"
+                    aria-hidden="true"
+                  >
+                    →
+                  </span>
+                </>
+              )}
+            </button>
+          </form>
 
-            <Link to="/" className="back-home">
-              ← Back to Home
+          <div className="login-divider">
+            <span>OR</span>
+          </div>
+
+          <div className="login-register">
+            <span>Don't have an account?</span>
+
+            <Link to="/register">
+              Create Account
             </Link>
           </div>
-        </div>
+
+          <div className="login-security-note">
+            <span aria-hidden="true">🔒</span>
+            <span>
+              Your connection and account information are
+              protected.
+            </span>
+          </div>
+        </section>
       </div>
-    </div>
+    </main>
   );
 }
 

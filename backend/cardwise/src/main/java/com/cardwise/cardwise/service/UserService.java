@@ -1,6 +1,7 @@
 package com.cardwise.cardwise.service;
 
 import com.cardwise.cardwise.entity.User;
+import com.cardwise.cardwise.entity.enums.UserRole;
 import com.cardwise.cardwise.repository.UserRepository;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,22 +29,41 @@ public class UserService {
 
     public User registerUser(User user) {
 
+        if (user == null) {
+            throw new RuntimeException(
+                    "User data is required"
+            );
+        }
+
         if (user.getName() == null ||
                 user.getName().isBlank()) {
 
-            throw new RuntimeException("Name is required");
+            throw new RuntimeException(
+                    "Name is required"
+            );
         }
 
         if (user.getEmail() == null ||
                 user.getEmail().isBlank()) {
 
-            throw new RuntimeException("Email is required");
+            throw new RuntimeException(
+                    "Email is required"
+            );
         }
 
         if (user.getPassword() == null ||
                 user.getPassword().isBlank()) {
 
-            throw new RuntimeException("Password is required");
+            throw new RuntimeException(
+                    "Password is required"
+            );
+        }
+
+        if (user.getPassword().length() < 6) {
+
+            throw new RuntimeException(
+                    "Password must contain at least 6 characters"
+            );
         }
 
         String email =
@@ -60,24 +80,66 @@ public class UserService {
 
         user.setEmail(email);
 
-        // Never trust role from frontend
-        user.setRole("USER");
+        // =================================================
+        // PHONE
+        // =================================================
 
-        // Hash password before saving
+        if (user.getPhone() != null &&
+                !user.getPhone().isBlank()) {
+
+            String phone =
+                    normalizePhone(
+                            user.getPhone()
+                    );
+
+            if (phone.length() != 10) {
+
+                throw new RuntimeException(
+                        "Enter a valid 10-digit mobile number"
+                );
+            }
+
+            if (userRepository.existsByPhone(phone)) {
+
+                throw new RuntimeException(
+                        "Mobile number already registered"
+                );
+            }
+
+            user.setPhone(phone);
+        }
+
+        // =================================================
+        // USER DETAILS
+        // =================================================
+
+        user.setName(
+                user.getName().trim()
+        );
+
+        /*
+         * Public registration must always create a USER.
+         * Never trust a role supplied by the frontend.
+         */
+        user.setRole(UserRole.USER);
+
+        user.setActive(true);
+
+        // =================================================
+        // HASH PASSWORD
+        // =================================================
+
         user.setPassword(
                 passwordEncoder.encode(
                         user.getPassword()
                 )
         );
 
-        // New accounts are active
-        user.setActive(true);
-
         return userRepository.save(user);
     }
 
     // =====================================================
-    // FIND USER BY EMAIL
+    // FIND BY EMAIL
     // =====================================================
 
     public User findByEmail(String email) {
@@ -85,24 +147,43 @@ public class UserService {
         if (email == null ||
                 email.isBlank()) {
 
-            throw new RuntimeException(
-                    "Email is required"
-            );
+            return null;
         }
 
         return userRepository
                 .findByEmail(
                         email.trim().toLowerCase()
                 )
-                .orElseThrow(() ->
-                        new RuntimeException(
-                                "User not found"
-                        )
-                );
+                .orElse(null);
     }
 
     // =====================================================
-    // FIND USER BY ID
+    // FIND BY PHONE
+    // =====================================================
+
+    public User findByPhone(String phone) {
+
+        if (phone == null ||
+                phone.isBlank()) {
+
+            return null;
+        }
+
+        String normalizedPhone =
+                normalizePhone(phone);
+
+        if (normalizedPhone.length() != 10) {
+
+            return null;
+        }
+
+        return userRepository
+                .findByPhone(normalizedPhone)
+                .orElse(null);
+    }
+
+    // =====================================================
+    // FIND BY ID
     // =====================================================
 
     public User findById(Long id) {
@@ -121,6 +202,47 @@ public class UserService {
                                 "User not found"
                         )
                 );
+    }
+
+    // =====================================================
+    // UPDATE PASSWORD
+    // =====================================================
+
+    public User updatePassword(
+            Long id,
+            String newPassword) {
+
+        if (id == null) {
+
+            throw new RuntimeException(
+                    "User ID is required"
+            );
+        }
+
+        if (newPassword == null ||
+                newPassword.isBlank()) {
+
+            throw new RuntimeException(
+                    "New password is required"
+            );
+        }
+
+        if (newPassword.length() < 6) {
+
+            throw new RuntimeException(
+                    "Password must contain at least 6 characters"
+            );
+        }
+
+        User user = findById(id);
+
+        user.setPassword(
+                passwordEncoder.encode(
+                        newPassword
+                )
+        );
+
+        return userRepository.save(user);
     }
 
     // =====================================================
@@ -143,6 +265,17 @@ public class UserService {
 
         User user = findById(id);
 
+        if (updatedUser == null) {
+
+            throw new RuntimeException(
+                    "Profile data is required"
+            );
+        }
+
+        // =================================================
+        // NAME
+        // =================================================
+
         if (updatedUser.getName() != null &&
                 !updatedUser.getName().isBlank()) {
 
@@ -151,12 +284,51 @@ public class UserService {
             );
         }
 
+        // =================================================
+        // PHONE
+        // =================================================
+
         if (updatedUser.getPhone() != null) {
 
-            user.setPhone(
-                    updatedUser.getPhone().trim()
-            );
+            String phone =
+                    normalizePhone(
+                            updatedUser.getPhone()
+                    );
+
+            if (phone.isBlank()) {
+
+                user.setPhone(null);
+
+            } else {
+
+                if (phone.length() != 10) {
+
+                    throw new RuntimeException(
+                            "Enter a valid 10-digit mobile number"
+                    );
+                }
+
+                User existingUser =
+                        userRepository
+                                .findByPhone(phone)
+                                .orElse(null);
+
+                if (existingUser != null &&
+                        !existingUser.getId()
+                                .equals(id)) {
+
+                    throw new RuntimeException(
+                            "Mobile number already registered"
+                    );
+                }
+
+                user.setPhone(phone);
+            }
         }
+
+        // =================================================
+        // ADDRESS
+        // =================================================
 
         if (updatedUser.getAddress() != null) {
 
@@ -165,6 +337,10 @@ public class UserService {
             );
         }
 
+        // =================================================
+        // CITY
+        // =================================================
+
         if (updatedUser.getCity() != null) {
 
             user.setCity(
@@ -172,12 +348,20 @@ public class UserService {
             );
         }
 
+        // =================================================
+        // STATE
+        // =================================================
+
         if (updatedUser.getState() != null) {
 
             user.setState(
                     updatedUser.getState().trim()
             );
         }
+
+        // =================================================
+        // PINCODE
+        // =================================================
 
         if (updatedUser.getPincode() != null) {
 
@@ -190,15 +374,14 @@ public class UserService {
     }
 
     // =====================================================
-    // ADMIN BLOCK USER
+    // BLOCK USER
     // =====================================================
 
     public User blockUser(Long id) {
 
         User user = findById(id);
 
-        if ("ADMIN".equalsIgnoreCase(
-                user.getRole())) {
+        if (user.getRole() == UserRole.ADMIN) {
 
             throw new RuntimeException(
                     "Administrator cannot be blocked"
@@ -211,7 +394,7 @@ public class UserService {
     }
 
     // =====================================================
-    // ADMIN UNBLOCK USER
+    // UNBLOCK USER
     // =====================================================
 
     public User unblockUser(Long id) {
@@ -247,5 +430,40 @@ public class UserService {
                 rawPassword,
                 encodedPassword
         );
+    }
+
+    // =====================================================
+    // NORMALIZE PHONE
+    // =====================================================
+
+    private String normalizePhone(String phone) {
+
+        if (phone == null) {
+            return "";
+        }
+
+        String digits =
+                phone.replaceAll(
+                        "[^0-9]",
+                        ""
+                );
+
+        if (digits.length() == 10) {
+            return digits;
+        }
+
+        if (digits.length() == 12 &&
+                digits.startsWith("91")) {
+
+            return digits.substring(2);
+        }
+
+        if (digits.length() == 11 &&
+                digits.startsWith("0")) {
+
+            return digits.substring(1);
+        }
+
+        return digits;
     }
 }

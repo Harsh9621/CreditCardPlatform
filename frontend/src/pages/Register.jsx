@@ -1,21 +1,73 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+
 import api from "../services/api";
+
 import "./Register.css";
 
 function Register() {
   const navigate = useNavigate();
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // =====================================================
+  // INPUT HANDLING
+  // =====================================================
+
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+
+    setFormData((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
+
+    if (error) {
+      setError("");
+    }
+
+    if (success) {
+      setSuccess("");
+    }
+  };
+
+  // =====================================================
+  // REGISTRATION
+  // =====================================================
+
   const handleRegister = async (event) => {
     event.preventDefault();
+
+    if (loading) {
+      return;
+    }
+
+    const name = formData.name.trim();
+    const email = formData.email.trim();
+    const password = formData.password;
+
+    if (!name || !email || !password) {
+      setError("Please fill in all required fields.");
+      return;
+    }
+
+    if (name.length < 2) {
+      setError("Please enter a valid full name.");
+      return;
+    }
+
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters.");
+      return;
+    }
 
     setError("");
     setSuccess("");
@@ -23,140 +75,274 @@ function Register() {
 
     try {
       const response = await api.post("/auth/register", {
-        name: name.trim(),
-        email: email.trim(),
+        name,
+        email,
         password,
         role: "USER",
       });
 
-      console.log("REGISTER RESPONSE:", response.data);
+      console.log("CardWise registration successful:", response.data);
 
       setSuccess("Account created successfully! Redirecting to login...");
 
+      setFormData({
+        name: "",
+        email: "",
+        password: "",
+      });
+
       setTimeout(() => {
-        navigate("/login");
+        navigate("/login", {
+          replace: true,
+        });
       }, 1500);
-    } catch (error) {
-      console.error("Registration error:", error);
+    } catch (err) {
+      console.error("CardWise registration failed:", err);
 
-      const message =
-        error.response?.data?.message ||
-        (typeof error.response?.data === "string"
-          ? error.response.data
-          : null) ||
-        "Registration failed. Please try again.";
+      const status = err.response?.status;
 
-      setError(message);
+      const backendMessage =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        (typeof err.response?.data === "string" ? err.response.data : null);
+
+      if (status === 409) {
+        setError(
+          backendMessage || "An account with this email already exists.",
+        );
+      } else if (status === 400) {
+        setError(backendMessage || "Please check your registration details.");
+      } else if (!err.response) {
+        setError(
+          "Unable to connect to the CardWise server. Please make sure the backend is running.",
+        );
+      } else {
+        setError(
+          backendMessage ||
+            err.message ||
+            "Registration failed. Please try again.",
+        );
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <div className="register-page">
-      <div className="register-container">
-        {/* LEFT SIDE */}
+  // =====================================================
+  // UI
+  // =====================================================
 
-        <div className="register-brand">
-          <Link to="/" className="register-brand-logo">
-            <span className="register-logo-icon">C</span>
-            CardWise
+  return (
+    <main className="register-page">
+      <div className="register-background" aria-hidden="true">
+        <div className="register-background-grid" />
+
+        <div className="register-background-glow register-glow-one" />
+
+        <div className="register-background-glow register-glow-two" />
+      </div>
+
+      <div className="register-layout">
+        {/* =================================================
+            LEFT BRAND PANEL
+            ================================================= */}
+
+        <section className="register-intro">
+          <Link
+            to="/"
+            className="register-brand-logo"
+            aria-label="CardWise Home"
+          >
+            <span className="register-logo-icon" aria-hidden="true">
+              C
+            </span>
+
+            <span className="register-logo-text">
+              Card<span>Wise</span>
+            </span>
           </Link>
 
           <div className="register-brand-content">
-            <span>START YOUR CARDWISE JOURNEY</span>
+            <div className="register-intro-badge">
+              <span className="register-intro-badge-dot" aria-hidden="true" />
+              START YOUR CARDWISE JOURNEY
+            </div>
 
             <h1>
               Discover cards
-              <br />
-              built for you.
+              <span>built for you.</span>
             </h1>
 
             <p>
               Create your CardWise account and compare credit cards, explore
-              rewards and manage your applications from one place.
+              rewards, and manage your applications from one place.
             </p>
 
             <div className="register-features">
-              <div>
-                <span>✓</span>
-                Compare cards easily
+              <div className="register-feature">
+                <span className="register-feature-icon" aria-hidden="true">
+                  ✓
+                </span>
+
+                <div>
+                  <strong>Compare cards easily</strong>
+                  <span>Review important card features in one place.</span>
+                </div>
               </div>
 
-              <div>
-                <span>✓</span>
-                Find better rewards
+              <div className="register-feature">
+                <span className="register-feature-icon" aria-hidden="true">
+                  ✓
+                </span>
+
+                <div>
+                  <strong>Find better rewards</strong>
+                  <span>Discover benefits that match your needs.</span>
+                </div>
               </div>
 
-              <div>
-                <span>✓</span>
-                Track applications
+              <div className="register-feature">
+                <span className="register-feature-icon" aria-hidden="true">
+                  ✓
+                </span>
+
+                <div>
+                  <strong>Track applications</strong>
+                  <span>Manage your credit card applications easily.</span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* RIGHT SIDE */}
+        {/* =================================================
+            REGISTER CARD
+            ================================================= */}
 
-        <div className="register-form-area">
+        <section className="register-form-area">
           <div className="register-card">
-            <Link to="/" className="mobile-register-logo">
-              <span className="register-logo-icon">C</span>
-              CardWise
-            </Link>
+            <div className="register-card-top">
+              <div className="register-card-logo" aria-hidden="true">
+                C
+              </div>
 
-            <div className="register-heading">
-              <h2>Create Account</h2>
-
-              <p>Join CardWise and discover better credit cards.</p>
+              <span className="register-card-brand">
+                Card<span>Wise</span>
+              </span>
             </div>
 
-            {error && <div className="register-error">{error}</div>}
+            <div className="register-heading">
+              <span className="register-eyebrow">GET STARTED</span>
 
-            {success && <div className="register-success">{success}</div>}
+              <h2>Create your account</h2>
 
-            <form onSubmit={handleRegister}>
+              <p>Join CardWise and discover smarter credit card choices.</p>
+            </div>
+
+            {error && (
+              <div
+                className="register-message register-error"
+                role="alert"
+                aria-live="polite"
+              >
+                <span className="register-message-icon" aria-hidden="true">
+                  !
+                </span>
+
+                <span>{error}</span>
+              </div>
+            )}
+
+            {success && (
+              <div
+                className="register-message register-success"
+                role="status"
+                aria-live="polite"
+              >
+                <span className="register-message-icon" aria-hidden="true">
+                  ✓
+                </span>
+
+                <span>{success}</span>
+              </div>
+            )}
+
+            <form
+              className="register-form"
+              onSubmit={handleRegister}
+              noValidate
+            >
               <div className="register-input-group">
                 <label htmlFor="name">Full Name</label>
 
-                <input
-                  id="name"
-                  type="text"
-                  placeholder="Enter your full name"
-                  value={name}
-                  onChange={(event) => setName(event.target.value)}
-                  autoComplete="name"
-                  required
-                />
+                <div className="register-input-wrapper">
+                  <span className="register-input-icon" aria-hidden="true">
+                    ◉
+                  </span>
+
+                  <input
+                    id="name"
+                    name="name"
+                    type="text"
+                    placeholder="Enter your full name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    autoComplete="name"
+                    required
+                    disabled={loading}
+                  />
+                </div>
               </div>
 
               <div className="register-input-group">
                 <label htmlFor="email">Email Address</label>
 
-                <input
-                  id="email"
-                  type="email"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                  autoComplete="email"
-                  required
-                />
+                <div className="register-input-wrapper">
+                  <span className="register-input-icon" aria-hidden="true">
+                    @
+                  </span>
+
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="Enter your email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    autoComplete="email"
+                    autoCapitalize="none"
+                    spellCheck="false"
+                    required
+                    disabled={loading}
+                  />
+                </div>
               </div>
 
               <div className="register-input-group">
                 <label htmlFor="password">Password</label>
 
-                <input
-                  id="password"
-                  type="password"
-                  placeholder="Create a password"
-                  value={password}
-                  onChange={(event) => setPassword(event.target.value)}
-                  autoComplete="new-password"
-                  minLength={6}
-                  required
-                />
+                <div className="register-input-wrapper">
+                  <span className="register-input-icon" aria-hidden="true">
+                    •••
+                  </span>
+
+                  <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    placeholder="Create a password"
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    autoComplete="new-password"
+                    minLength={6}
+                    required
+                    disabled={loading}
+                  />
+                </div>
+
+                <span className="register-password-hint">
+                  Use at least 6 characters.
+                </span>
               </div>
 
               <button
@@ -164,16 +350,29 @@ function Register() {
                 className="register-submit"
                 disabled={loading}
               >
-                {loading ? "Creating Account..." : "Create Account"}
+                {loading ? (
+                  <>
+                    <span
+                      className="register-submit-spinner"
+                      aria-hidden="true"
+                    />
+                    Creating Account...
+                  </>
+                ) : (
+                  <>
+                    Create Account
+                    <span className="register-submit-arrow" aria-hidden="true">
+                      →
+                    </span>
+                  </>
+                )}
               </button>
             </form>
 
             <div className="register-divider">
-              <span></span>
-
-              <p>Already have an account?</p>
-
-              <span></span>
+              <span />
+              <span>ALREADY A MEMBER?</span>
+              <span />
             </div>
 
             <Link to="/login" className="login-link-button">
@@ -183,10 +382,16 @@ function Register() {
             <Link to="/" className="register-back-home">
               ← Back to Home
             </Link>
+
+            <div className="register-security-note">
+              <span aria-hidden="true">🔒</span>
+
+              <span>Your account information is securely handled.</span>
+            </div>
           </div>
-        </div>
+        </section>
       </div>
-    </div>
+    </main>
   );
 }
 

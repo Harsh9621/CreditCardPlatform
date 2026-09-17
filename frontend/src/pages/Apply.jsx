@@ -1,101 +1,170 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams, Link } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
+
 import api from "../services/api";
 import "./Apply.css";
 
 function Apply() {
-  const { id } = useParams();
+  const { cardId } = useParams();
   const navigate = useNavigate();
 
   const [card, setCard] = useState(null);
-
-  const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    phone: "",
-    income: "",
-    employmentType: "",
-    address: "",
-  });
-
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   useEffect(() => {
-    const fetchCard = async () => {
+    let isMounted = true;
+
+    const loadCard = async () => {
       try {
-        const response = await api.get(`/cards/${id}`);
+        setLoading(true);
+        setError("");
 
-        setCard(response.data);
+        if (!cardId) {
+          throw new Error("Invalid credit card ID.");
+        }
 
-        const savedUser = localStorage.getItem("user");
+        const response = await api.get(`/cards/${cardId}`);
 
-        if (savedUser) {
-          const user = JSON.parse(savedUser);
-
-          setFormData((previous) => ({
-            ...previous,
-            fullName: user.name || "",
-            email: user.email || "",
-          }));
+        if (isMounted) {
+          setCard(response.data);
         }
       } catch (err) {
-        console.error("Apply card error:", err);
+        console.error("Unable to load card:", err);
 
-        setError(
-          err.response?.data?.message || "Unable to load credit card details.",
-        );
+        if (isMounted) {
+          setCard(null);
+          setError(
+            err.response?.data?.message ||
+              err.response?.data?.error ||
+              err.message ||
+              "Unable to load this credit card.",
+          );
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
-    fetchCard();
-  }, [id]);
+    loadCard();
 
-  const handleChange = (event) => {
-    const { name, value } = event.target;
+    return () => {
+      isMounted = false;
+    };
+  }, [cardId]);
 
-    setFormData((previous) => ({
-      ...previous,
-      [name]: value,
-    }));
+  const formatCurrency = (value) => {
+    return `₹${Number(value || 0).toLocaleString("en-IN")}`;
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const getBankInitial = () => {
+    return card?.bank?.trim()?.charAt(0)?.toUpperCase() || "C";
+  };
 
-    setError("");
-    setSubmitting(true);
-
+  const getSavedUser = () => {
     try {
       const savedUser = localStorage.getItem("user");
 
       if (!savedUser) {
-        navigate("/login");
+        return null;
+      }
+
+      const parsedUser = JSON.parse(savedUser);
+
+      return parsedUser?.id ? parsedUser : null;
+    } catch (err) {
+      console.error("Unable to read saved user:", err);
+
+      localStorage.removeItem("user");
+      return null;
+    }
+  };
+
+  const redirectToLogin = () => {
+    navigate("/login", {
+      state: {
+        from: `/apply/${cardId}`,
+      },
+    });
+  };
+
+  const submitApplication = async () => {
+    if (submitting || success) {
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      setError("");
+      setSuccess("");
+
+      const user = getSavedUser();
+
+      if (!user) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+
+        redirectToLogin();
         return;
       }
 
-      const user = JSON.parse(savedUser);
+      if (!card?.id) {
+        setError("The selected credit card is no longer available.");
+        return;
+      }
 
-      await api.post("/applications", {
-        userId: user.id,
-        creditCardId: Number(id),
-        fullName: formData.fullName,
-        email: formData.email,
-        phone: formData.phone,
-        income: Number(formData.income),
-        employmentType: formData.employmentType,
-        address: formData.address,
-      });
+      const response = await api.post(
+        `/applications/apply?userId=${user.id}&creditCardId=${card.id}`,
+      );
 
-      navigate("/applications");
+      setSuccess(
+        response.data?.message ||
+          "Your application has been submitted successfully.",
+      );
+
+      window.setTimeout(() => {
+        navigate("/applications", { replace: true });
+      }, 1200);
     } catch (err) {
       console.error("Application submission error:", err);
 
+      if (err.response?.status === 401) {
+        redirectToLogin();
+        return;
+      }
+
+      if (err.response?.status === 403) {
+        setError(
+          err.response?.data?.message ||
+            "You do not have permission to submit this application.",
+        );
+        return;
+      }
+
+      if (err.response?.status === 404) {
+        setError(
+          err.response?.data?.message ||
+            "The selected credit card could not be found.",
+        );
+        return;
+      }
+
+      if (err.response?.status === 409) {
+        setError(
+          err.response?.data?.message ||
+            "You already have an application for this card.",
+        );
+        return;
+      }
+
       setError(
-        err.response?.data?.message || "Unable to submit your application.",
+        err.response?.data?.message ||
+          err.response?.data?.error ||
+          "Unable to submit your application. Please try again.",
       );
     } finally {
       setSubmitting(false);
@@ -105,185 +174,279 @@ function Apply() {
   if (loading) {
     return (
       <div className="apply-page">
-        <div className="apply-message">Loading application...</div>
+        <section className="apply-loading">
+          <div className="apply-loader" aria-hidden="true"></div>
+
+          <h2>Loading Card...</h2>
+
+          <p>Preparing your application.</p>
+        </section>
       </div>
     );
   }
 
-  if (error && !card) {
+  if (!card) {
     return (
       <div className="apply-page">
-        <div className="apply-message error">{error}</div>
+        <section className="apply-error-page">
+          <div className="apply-error-icon" aria-hidden="true">
+            !
+          </div>
 
-        <Link to="/cards" className="back-link">
-          ← Back to Cards
-        </Link>
+          <span className="apply-error-badge">CREDIT CARD</span>
+
+          <h2>Card Not Found</h2>
+
+          <p>{error || "We could not find the credit card you selected."}</p>
+
+          <Link to="/cards" className="apply-primary-button">
+            Browse Cards
+          </Link>
+        </section>
       </div>
     );
   }
 
   return (
     <div className="apply-page">
-      <div className="apply-container">
-        <Link to={`/cards/${id}`} className="back-link">
-          ← Back to Card Details
-        </Link>
+      {/* =================================================
+          HERO
+      ================================================= */}
 
-        <div className="apply-layout">
-          {/* CARD INFORMATION */}
+      <section className="apply-hero">
+        <div className="apply-container">
+          <div className="apply-hero-content">
+            <div className="apply-hero-copy">
+              <span className="apply-eyebrow">CARDWISE APPLICATION</span>
 
-          <div className="apply-card-info">
-            <span className="apply-label">CARDWISE APPLICATION</span>
+              <h1>Apply for Your Credit Card</h1>
 
-            <h1>Apply for {card?.name}</h1>
-
-            <p className="apply-bank">{card?.bank}</p>
-
-            <div className="apply-card-summary">
-              <div>
-                <span>Card Type</span>
-                <strong>{card?.cardType}</strong>
-              </div>
-
-              <div>
-                <span>Cashback</span>
-                <strong>{card?.cashbackPercentage}%</strong>
-              </div>
-
-              <div>
-                <span>Annual Fee</span>
-                <strong>₹{card?.annualFee}</strong>
-              </div>
-
-              <div>
-                <span>Joining Fee</span>
-                <strong>₹{card?.joiningFee}</strong>
-              </div>
+              <p>
+                Review your selected card and submit your application securely.
+              </p>
             </div>
 
-            <div className="apply-benefits">
-              <h3>Why apply for this card?</h3>
-
-              <p>{card?.benefits}</p>
+            <div className="apply-hero-icon" aria-hidden="true">
+              💳
             </div>
           </div>
+        </div>
+      </section>
 
-          {/* APPLICATION FORM */}
+      {/* =================================================
+          CONTENT
+      ================================================= */}
 
-          <div className="apply-form-card">
-            <div className="apply-form-heading">
-              <h2>Application Details</h2>
+      <main className="apply-section">
+        <div className="apply-container">
+          {/* ERROR */}
 
-              <p>Enter your details to submit your credit card application.</p>
+          {error && (
+            <div className="apply-alert apply-alert-error" role="alert">
+              <span aria-hidden="true">!</span>
+
+              <div>
+                <strong>Application Error</strong>
+
+                <p>{error}</p>
+              </div>
             </div>
+          )}
 
-            {error && <div className="apply-error">{error}</div>}
+          {/* SUCCESS */}
 
-            <form onSubmit={handleSubmit}>
-              <div className="form-group">
-                <label htmlFor="fullName">Full Name</label>
+          {success && (
+            <div className="apply-alert apply-alert-success" role="status">
+              <span aria-hidden="true">✓</span>
 
-                <input
-                  id="fullName"
-                  name="fullName"
-                  type="text"
-                  value={formData.fullName}
-                  onChange={handleChange}
-                  placeholder="Enter your full name"
-                  required
-                />
+              <div>
+                <strong>Application Submitted</strong>
+
+                <p>{success}</p>
+              </div>
+            </div>
+          )}
+
+          <div className="apply-layout">
+            {/* =================================================
+                CARD SUMMARY
+            ================================================= */}
+
+            <section className="apply-card-summary">
+              <div className="apply-section-label">SELECTED CREDIT CARD</div>
+
+              <div className="apply-credit-card">
+                <div className="apply-card-glow"></div>
+
+                <div className="apply-card-top">
+                  <div className="apply-bank">
+                    <div className="apply-bank-circle">{getBankInitial()}</div>
+
+                    <span>{card.bank || "CardWise"}</span>
+                  </div>
+
+                  <span className="apply-card-network">VISA</span>
+                </div>
+
+                <div className="apply-chip" aria-hidden="true">
+                  <span></span>
+                </div>
+
+                <div className="apply-card-number">•••• •••• •••• ••••</div>
+
+                <div className="apply-card-bottom">
+                  <div>
+                    <small>CARD MEMBER</small>
+
+                    <strong>CARDWISE CUSTOMER</strong>
+                  </div>
+
+                  <div>
+                    <small>TYPE</small>
+
+                    <strong>{card.cardType || "CREDIT"}</strong>
+                  </div>
+                </div>
               </div>
 
-              <div className="form-group">
-                <label htmlFor="email">Email Address</label>
+              <div className="apply-card-name">
+                <span className="apply-card-type">
+                  {card.cardType || "Credit Card"}
+                </span>
 
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="Enter your email"
-                  required
-                />
+                <h2>{card.name}</h2>
+
+                <p>
+                  {card.bank || "CardWise"}
+                  {" • "}
+                  {card.cardType || "Credit Card"}
+                </p>
               </div>
 
-              <div className="form-group">
-                <label htmlFor="phone">Phone Number</label>
+              {/* FEATURES */}
 
-                <input
-                  id="phone"
-                  name="phone"
-                  type="tel"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  placeholder="Enter your phone number"
-                  required
-                />
+              <div className="apply-features">
+                <div className="apply-feature">
+                  <span>Annual Fee</span>
+
+                  <strong>{formatCurrency(card.annualFee)}</strong>
+
+                  <small>Yearly</small>
+                </div>
+
+                <div className="apply-feature">
+                  <span>Joining Fee</span>
+
+                  <strong>{formatCurrency(card.joiningFee)}</strong>
+
+                  <small>One-time</small>
+                </div>
+
+                <div className="apply-feature">
+                  <span>Cashback</span>
+
+                  <strong>{card.cashbackPercentage ?? 0}%</strong>
+
+                  <small>Rewards</small>
+                </div>
+
+                <div className="apply-feature">
+                  <span>Rewards</span>
+
+                  <strong>{card.rewardType || "Rewards"}</strong>
+
+                  <small>Card benefits</small>
+                </div>
+              </div>
+            </section>
+
+            {/* =================================================
+                APPLICATION CONFIRMATION
+            ================================================= */}
+
+            <section className="apply-form-card">
+              <div className="apply-form-header">
+                <span className="apply-section-label">APPLICATION</span>
+
+                <h2>Confirm Your Application</h2>
+
+                <p>
+                  Your CardWise account information will be used to process this
+                  application.
+                </p>
               </div>
 
-              <div className="form-group">
-                <label htmlFor="income">Monthly Income</label>
+              <div className="apply-confirmation">
+                <div className="apply-confirmation-icon" aria-hidden="true">
+                  ✓
+                </div>
 
-                <input
-                  id="income"
-                  name="income"
-                  type="number"
-                  value={formData.income}
-                  onChange={handleChange}
-                  placeholder="Enter your monthly income"
-                  min="0"
-                  required
-                />
+                <div>
+                  <h3>Ready to Apply?</h3>
+
+                  <p>
+                    By clicking <strong>Submit Application</strong>, your
+                    application for <strong>{card.name}</strong> will be
+                    submitted for review.
+                  </p>
+                </div>
               </div>
 
-              <div className="form-group">
-                <label htmlFor="employmentType">Employment Type</label>
+              <div className="apply-benefits">
+                <div>
+                  <span aria-hidden="true">✓</span>
+                  Secure application
+                </div>
 
-                <select
-                  id="employmentType"
-                  name="employmentType"
-                  value={formData.employmentType}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="">Select employment type</option>
+                <div>
+                  <span aria-hidden="true">✓</span>
+                  Application tracking
+                </div>
 
-                  <option value="SALARIED">Salaried</option>
-
-                  <option value="SELF_EMPLOYED">Self Employed</option>
-
-                  <option value="BUSINESS">Business Owner</option>
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="address">Address</label>
-
-                <textarea
-                  id="address"
-                  name="address"
-                  value={formData.address}
-                  onChange={handleChange}
-                  placeholder="Enter your address"
-                  rows="4"
-                  required
-                />
+                <div>
+                  <span aria-hidden="true">✓</span>
+                  Status updates
+                </div>
               </div>
 
               <button
-                type="submit"
-                className="submit-application"
-                disabled={submitting}
+                type="button"
+                className="apply-submit-button"
+                onClick={submitApplication}
+                disabled={submitting || Boolean(success)}
+                aria-busy={submitting}
               >
                 {submitting
-                  ? "Submitting Application..."
-                  : "Submit Application"}
+                  ? "Submitting..."
+                  : success
+                    ? "Application Submitted ✓"
+                    : "Submit Application"}
               </button>
-            </form>
+
+              <Link to={`/cards/${card.id}`} className="apply-back-button">
+                ← Back to Card Details
+              </Link>
+            </section>
+          </div>
+
+          {/* =================================================
+              SECURITY NOTE
+          ================================================= */}
+
+          <div className="apply-security-note">
+            <span aria-hidden="true">🔒</span>
+
+            <div>
+              <strong>Your information is secure</strong>
+
+              <p>
+                CardWise uses secure authentication to protect your account and
+                application information.
+              </p>
+            </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 package com.cardwise.cardwise;
 
 import com.cardwise.cardwise.entity.User;
+import com.cardwise.cardwise.entity.enums.UserRole;
 import com.cardwise.cardwise.repository.UserRepository;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +26,10 @@ public class AdminSeeder {
 
         return args -> {
 
+            // =================================================
+            // CHECK ADMIN PASSWORD
+            // =================================================
+
             if (adminPassword == null ||
                     adminPassword.isBlank()) {
 
@@ -36,44 +41,55 @@ public class AdminSeeder {
                 return;
             }
 
-            if (userRepository.existsByEmail(adminEmail)) {
+            // =================================================
+            // CHECK EXISTING ADMIN
+            // =================================================
+
+            String normalizedEmail =
+                    adminEmail.trim().toLowerCase();
+
+            if (userRepository.existsByEmail(
+                    normalizedEmail)) {
 
                 System.out.println(
-                        "CardWise ADMIN already exists: " +
-                        adminEmail
+                        "CardWise ADMIN already exists."
                 );
 
                 return;
             }
+
+            // =================================================
+            // CREATE ADMIN
+            // =================================================
 
             User admin = new User();
 
             admin.setName("CardWise Admin");
 
             admin.setEmail(
-                    adminEmail.trim().toLowerCase()
+                    normalizedEmail
             );
 
             admin.setPassword(
-                    passwordEncoder.encode(adminPassword)
+                    passwordEncoder.encode(
+                            adminPassword
+                    )
             );
 
-            admin.setRole("ADMIN");
+            admin.setRole(
+                    UserRole.ADMIN
+            );
+
             admin.setActive(true);
 
             userRepository.save(admin);
 
+            // =================================================
+            // SUCCESS MESSAGE
+            // =================================================
+
             System.out.println(
                     "CardWise ADMIN account created successfully."
-            );
-
-            System.out.println(
-                    "Admin email: " + adminEmail
-            );
-
-            System.out.println(
-                    "Admin password is configured securely " +
-                    "through environment variables."
             );
         };
     }

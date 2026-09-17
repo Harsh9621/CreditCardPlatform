@@ -46,7 +46,10 @@ public class AdminApplicationController {
                     .body(
                             Map.of(
                                     "message",
-                                    e.getMessage()
+                                    safeMessage(
+                                            e,
+                                            "Unable to load applications."
+                                    )
                             )
                     );
         }
@@ -74,7 +77,10 @@ public class AdminApplicationController {
                     .body(
                             Map.of(
                                     "message",
-                                    e.getMessage()
+                                    safeMessage(
+                                            e,
+                                            "Unable to load pending applications."
+                                    )
                             )
                     );
         }
@@ -102,7 +108,10 @@ public class AdminApplicationController {
                     .body(
                             Map.of(
                                     "message",
-                                    e.getMessage()
+                                    safeMessage(
+                                            e,
+                                            "Unable to load approved applications."
+                                    )
                             )
                     );
         }
@@ -130,7 +139,10 @@ public class AdminApplicationController {
                     .body(
                             Map.of(
                                     "message",
-                                    e.getMessage()
+                                    safeMessage(
+                                            e,
+                                            "Unable to load rejected applications."
+                                    )
                             )
                     );
         }
@@ -178,12 +190,26 @@ public class AdminApplicationController {
             Application application =
                     applicationService.approveApplication(id);
 
+            /*
+             * IMPORTANT:
+             * Do NOT return the complete Application entity here.
+             *
+             * Application contains LAZY User/CreditCard relationships.
+             * Returning the entity causes Jackson to access those
+             * Hibernate proxies after the session is closed.
+             */
+
             return ResponseEntity.ok(
                     Map.of(
                             "message",
-                            "Application approved successfully",
-                            "application",
-                            application
+                            "Application #" + application.getId()
+                                    + " approved successfully",
+
+                            "applicationId",
+                            application.getId(),
+
+                            "status",
+                            application.getStatus().name()
                     )
             );
 
@@ -194,7 +220,10 @@ public class AdminApplicationController {
                     .body(
                             Map.of(
                                     "message",
-                                    e.getMessage()
+                                    safeMessage(
+                                            e,
+                                            "Application cannot be approved."
+                                    )
                             )
                     );
 
@@ -205,7 +234,10 @@ public class AdminApplicationController {
                     .body(
                             Map.of(
                                     "message",
-                                    e.getMessage()
+                                    safeMessage(
+                                            e,
+                                            "Unable to approve application."
+                                    )
                             )
                     );
         }
@@ -225,12 +257,22 @@ public class AdminApplicationController {
             Application application =
                     applicationService.rejectApplication(id);
 
+            /*
+             * Do NOT return the complete Application entity.
+             * Return only simple JSON values.
+             */
+
             return ResponseEntity.ok(
                     Map.of(
                             "message",
-                            "Application rejected successfully",
-                            "application",
-                            application
+                            "Application #" + application.getId()
+                                    + " rejected successfully",
+
+                            "applicationId",
+                            application.getId(),
+
+                            "status",
+                            application.getStatus().name()
                     )
             );
 
@@ -241,7 +283,10 @@ public class AdminApplicationController {
                     .body(
                             Map.of(
                                     "message",
-                                    e.getMessage()
+                                    safeMessage(
+                                            e,
+                                            "Application cannot be rejected."
+                                    )
                             )
                     );
 
@@ -252,7 +297,10 @@ public class AdminApplicationController {
                     .body(
                             Map.of(
                                     "message",
-                                    e.getMessage()
+                                    safeMessage(
+                                            e,
+                                            "Unable to reject application."
+                                    )
                             )
                     );
         }
@@ -281,9 +329,34 @@ public class AdminApplicationController {
                     .body(
                             Map.of(
                                     "message",
-                                    e.getMessage()
+                                    safeMessage(
+                                            e,
+                                            "Unable to load applications."
+                                    )
                             )
                     );
         }
+    }
+
+
+    // =====================================================
+    // SAFE ERROR MESSAGE
+    // =====================================================
+
+    private String safeMessage(
+            RuntimeException e,
+            String fallback) {
+
+        if (e == null) {
+            return fallback;
+        }
+
+        String message = e.getMessage();
+
+        if (message == null || message.isBlank()) {
+            return fallback;
+        }
+
+        return message;
     }
 }

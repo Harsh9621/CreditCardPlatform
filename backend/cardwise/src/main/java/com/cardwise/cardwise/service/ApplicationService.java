@@ -3,11 +3,13 @@ package com.cardwise.cardwise.service;
 import com.cardwise.cardwise.entity.Application;
 import com.cardwise.cardwise.entity.CreditCard;
 import com.cardwise.cardwise.entity.User;
+import com.cardwise.cardwise.entity.enums.ApplicationStatus;
 import com.cardwise.cardwise.repository.ApplicationRepository;
 import com.cardwise.cardwise.repository.CreditCardRepository;
 import com.cardwise.cardwise.repository.UserRepository;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,7 +20,6 @@ public class ApplicationService {
     private final ApplicationRepository applicationRepository;
     private final UserRepository userRepository;
     private final CreditCardRepository creditCardRepository;
-
 
     // =====================================================
     // CONSTRUCTOR
@@ -34,14 +35,26 @@ public class ApplicationService {
         this.creditCardRepository = creditCardRepository;
     }
 
-
     // =====================================================
     // APPLY FOR CREDIT CARD
     // =====================================================
 
+    @Transactional
     public Application applyForCard(
             Long userId,
             Long creditCardId) {
+
+        if (userId == null) {
+            throw new IllegalArgumentException(
+                    "User ID is required"
+            );
+        }
+
+        if (creditCardId == null) {
+            throw new IllegalArgumentException(
+                    "Credit card ID is required"
+            );
+        }
 
         // -------------------------------------------------
         // FIND USER
@@ -56,7 +69,6 @@ public class ApplicationService {
                                 )
                         );
 
-
         // -------------------------------------------------
         // CHECK USER ACCOUNT
         // -------------------------------------------------
@@ -67,7 +79,6 @@ public class ApplicationService {
                     "Your account is inactive. You cannot apply for a credit card."
             );
         }
-
 
         // -------------------------------------------------
         // FIND CREDIT CARD
@@ -82,7 +93,6 @@ public class ApplicationService {
                                 )
                         );
 
-
         // -------------------------------------------------
         // FIND LATEST APPLICATION
         // -------------------------------------------------
@@ -94,58 +104,41 @@ public class ApplicationService {
                                 creditCardId
                         );
 
-
         // -------------------------------------------------
         // CHECK LATEST APPLICATION
         // -------------------------------------------------
 
         if (latestApplication != null) {
 
-            String latestStatus =
+            ApplicationStatus latestStatus =
                     latestApplication.getStatus();
 
-
-            // ---------------------------------------------
-            // PENDING
-            // ---------------------------------------------
-
-            if ("PENDING".equalsIgnoreCase(
-                    latestStatus)) {
+            if (latestStatus == ApplicationStatus.PENDING) {
 
                 throw new IllegalStateException(
                         "You already have a pending application for this credit card."
                 );
             }
 
-
-            // ---------------------------------------------
-            // APPROVED
-            // ---------------------------------------------
-
-            if ("APPROVED".equalsIgnoreCase(
-                    latestStatus)) {
+            if (latestStatus == ApplicationStatus.APPROVED) {
 
                 throw new IllegalStateException(
                         "You already have an approved application for this credit card."
                 );
             }
 
-
-            // ---------------------------------------------
-            // REJECTED
-            // ---------------------------------------------
-
-            if ("REJECTED".equalsIgnoreCase(
-                    latestStatus)) {
-
-                // User is allowed to apply again.
-            }
+            /*
+             * REJECTED:
+             *
+             * The user is allowed to submit a new application.
+             */
         }
 
+        // -------------------------------------------------
+        // CREATE APPLICATION
+        // -------------------------------------------------
 
-        // -------------------------------------------------
-        // CREATE NEW APPLICATION
-        // -------------------------------------------------
+        LocalDateTime now = LocalDateTime.now();
 
         Application application =
                 new Application();
@@ -157,16 +150,21 @@ public class ApplicationService {
         );
 
         application.setStatus(
-                "PENDING"
+                ApplicationStatus.PENDING
         );
 
-        application.setAppliedAt(
-                LocalDateTime.now()
-        );
+        application.setAppliedAt(now);
 
+        /*
+         * Explicitly initialize audit fields as well.
+         *
+         * This works together with @PrePersist in Application.
+         */
+        application.setCreatedAt(now);
+        application.setUpdatedAt(now);
 
         // -------------------------------------------------
-        // SAVE APPLICATION
+        // SAVE
         // -------------------------------------------------
 
         return applicationRepository.save(
@@ -174,26 +172,31 @@ public class ApplicationService {
         );
     }
 
-
     // =====================================================
     // GET ALL APPLICATIONS
     // =====================================================
 
-    public List<Application>
-    getAllApplications() {
+    @Transactional(readOnly = true)
+    public List<Application> getAllApplications() {
 
         return applicationRepository
                 .findAllByOrderByAppliedAtDesc();
     }
 
-
     // =====================================================
     // GET APPLICATION BY ID
     // =====================================================
 
-    public Application
-    getApplicationById(
+    @Transactional(readOnly = true)
+    public Application getApplicationById(
             Long id) {
+
+        if (id == null) {
+
+            throw new RuntimeException(
+                    "Application ID is required"
+            );
+        }
 
         return applicationRepository
                 .findById(id)
@@ -204,14 +207,20 @@ public class ApplicationService {
                 );
     }
 
-
     // =====================================================
     // GET USER APPLICATIONS
     // =====================================================
 
-    public List<Application>
-    getApplicationsByUser(
+    @Transactional(readOnly = true)
+    public List<Application> getApplicationsByUser(
             Long userId) {
+
+        if (userId == null) {
+
+            throw new IllegalArgumentException(
+                    "User ID is required"
+            );
+        }
 
         return applicationRepository
                 .findByUserIdOrderByAppliedAtDesc(
@@ -219,14 +228,20 @@ public class ApplicationService {
                 );
     }
 
-
     // =====================================================
     // GET APPLICATIONS BY CREDIT CARD
     // =====================================================
 
-    public List<Application>
-    getApplicationsByCard(
+    @Transactional(readOnly = true)
+    public List<Application> getApplicationsByCard(
             Long creditCardId) {
+
+        if (creditCardId == null) {
+
+            throw new IllegalArgumentException(
+                    "Credit card ID is required"
+            );
+        }
 
         return applicationRepository
                 .findByCreditCardIdOrderByAppliedAtDesc(
@@ -234,125 +249,180 @@ public class ApplicationService {
                 );
     }
 
-
     // =====================================================
     // GET APPLICATIONS BY STATUS
     // =====================================================
 
-    public List<Application>
-    getApplicationsByStatus(
+    @Transactional(readOnly = true)
+    public List<Application> getApplicationsByStatus(
             String status) {
 
+        if (status == null ||
+                status.isBlank()) {
+
+            throw new IllegalArgumentException(
+                    "Application status is required"
+            );
+        }
+
+        ApplicationStatus applicationStatus;
+
+        try {
+
+            applicationStatus =
+                    ApplicationStatus.valueOf(
+                            status.trim().toUpperCase()
+                    );
+
+        } catch (IllegalArgumentException ex) {
+
+            throw new IllegalArgumentException(
+                    "Invalid application status: " +
+                            status
+            );
+        }
+
         return applicationRepository
-                .findByStatusIgnoreCaseOrderByAppliedAtDesc(
-                        status
+                .findByStatusOrderByAppliedAtDesc(
+                        applicationStatus
                 );
     }
-
 
     // =====================================================
     // APPROVE APPLICATION
     // =====================================================
 
-    public Application
-    approveApplication(
+    @Transactional
+    public Application approveApplication(
             Long id) {
+
+        if (id == null) {
+
+            throw new IllegalArgumentException(
+                    "Application ID is required"
+            );
+        }
 
         Application application =
                 getApplicationById(id);
 
-        String currentStatus =
+        ApplicationStatus currentStatus =
                 application.getStatus();
-
 
         // -------------------------------------------------
         // ALREADY APPROVED
         // -------------------------------------------------
 
-        if ("APPROVED".equalsIgnoreCase(
-                currentStatus)) {
+        if (currentStatus == ApplicationStatus.APPROVED) {
 
             throw new IllegalStateException(
                     "Application is already approved."
             );
         }
 
-
         // -------------------------------------------------
         // REJECTED CANNOT BE APPROVED
         // -------------------------------------------------
 
-        if ("REJECTED".equalsIgnoreCase(
-                currentStatus)) {
+        if (currentStatus == ApplicationStatus.REJECTED) {
 
             throw new IllegalStateException(
                     "A rejected application cannot be approved."
             );
         }
 
-
         // -------------------------------------------------
         // APPROVE
         // -------------------------------------------------
 
         application.setStatus(
-                "APPROVED"
+                ApplicationStatus.APPROVED
         );
+
+        application.setReviewedAt(
+                LocalDateTime.now()
+        );
+
+        /*
+         * reviewedBy is intentionally not set here because
+         * this method currently receives only the application ID.
+         *
+         * We can add the authenticated admin later without
+         * breaking the current endpoint.
+         */
+
+        // -------------------------------------------------
+        // SAVE
+        // -------------------------------------------------
 
         return applicationRepository.save(
                 application
         );
     }
 
-
     // =====================================================
     // REJECT APPLICATION
     // =====================================================
 
-    public Application
-    rejectApplication(
+    @Transactional
+    public Application rejectApplication(
             Long id) {
+
+        if (id == null) {
+
+            throw new IllegalArgumentException(
+                    "Application ID is required"
+            );
+        }
 
         Application application =
                 getApplicationById(id);
 
-        String currentStatus =
+        ApplicationStatus currentStatus =
                 application.getStatus();
-
 
         // -------------------------------------------------
         // ALREADY REJECTED
         // -------------------------------------------------
 
-        if ("REJECTED".equalsIgnoreCase(
-                currentStatus)) {
+        if (currentStatus == ApplicationStatus.REJECTED) {
 
             throw new IllegalStateException(
                     "Application is already rejected."
             );
         }
 
-
         // -------------------------------------------------
         // APPROVED CANNOT BE REJECTED
         // -------------------------------------------------
 
-        if ("APPROVED".equalsIgnoreCase(
-                currentStatus)) {
+        if (currentStatus == ApplicationStatus.APPROVED) {
 
             throw new IllegalStateException(
                     "An approved application cannot be rejected."
             );
         }
 
-
         // -------------------------------------------------
         // REJECT
         // -------------------------------------------------
 
         application.setStatus(
-                "REJECTED"
+                ApplicationStatus.REJECTED
         );
+
+        application.setReviewedAt(
+                LocalDateTime.now()
+        );
+
+        /*
+         * reviewedBy will be populated later when the
+         * authenticated admin is passed into the service.
+         */
+
+        // -------------------------------------------------
+        // SAVE
+        // -------------------------------------------------
 
         return applicationRepository.save(
                 application

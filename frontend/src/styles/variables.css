@@ -1,0 +1,357 @@
+/* =========================================================
+   CARDWISE — MASTER DESIGN TOKENS
+   Premium Fintech Design System
+   ========================================================= */
+
+/* =========================================================
+   BRAND
+   ========================================================= */
+
+:root {
+  --cw-brand-blue: #1769e0;
+  --cw-brand-blue-dark: #0f4fae;
+  --cw-brand-blue-soft: #edf5ff;
+  --cw-brand-navy: #0b1f3a;
+
+  --cw-gradient-brand: linear-gradient(
+    135deg,
+    #0f4fae 0%,
+    #1769e0 52%,
+    #4f8cff 100%
+  );
+
+  --cw-gradient-soft: linear-gradient(135deg, #f7fbff 0%, #edf5ff 100%);
+
+  --cw-gradient-dark: linear-gradient(
+    135deg,
+    #07152a 0%,
+    #0b1f3a 52%,
+    #123e78 100%
+  );
+
+  --cw-gradient-card: linear-gradient(
+    135deg,
+    #0b1f3a 0%,
+    #145fc4 55%,
+    #4f8cff 100%
+  );
+}
+
+/* =========================================================
+   BACKWARD-COMPATIBLE BRAND TOKENS
+   ========================================================= */
+
+:root {
+  --cw-primary: var(--cw-brand-blue);
+  --cw-primary-dark: var(--cw-brand-blue-dark);
+  --cw-primary-light: var(--cw-brand-blue-soft);
+
+  --cw-secondary: #2563eb;
+  --cw-navy: var(--cw-brand-navy);
+}
+
+/* =========================================================
+   TYPOGRAPHY
+   ========================================================= */
+
+:root {
+  --cw-font-heading:
+    "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  --cw-font-body:
+    "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  --cw-text-xs: 0.75rem;
+  --cw-text-sm: 0.875rem;
+  --cw-text-md: 1rem;
+  --cw-text-lg: 1.125rem;
+  --cw-text-xl: 1.25rem;
+  --cw-text-2xl: 1.5rem;
+  --cw-text-3xl: 1.875rem;
+  --cw-text-4xl: 2.25rem;
+  --cw-text-5xl: 3rem;
+  --cw-text-6xl: 3.75rem;
+
+  --cw-weight-regular: 400;
+  --cw-weight-medium: 500;
+  --cw-weight-semibold: 600;
+  --cw-weight-bold: 700;
+  --cw-weight-extrabold: 800;
+
+  --cw-letter-tight: -0.035em;
+  --cw-letter-normal: 0;
+  --cw-letter-wide: 0.04em;
+}
+
+/* =========================================================
+   TEXT COLORS
+   ========================================================= */
+
+:root {
+  --cw-heading: #10233f;
+  --cw-text: #334155;
+  --cw-muted: #64748b;
+  --cw-light-text: #94a3b8;
+  --cw-white: #ffffff;
+}
+
+/* =========================================================
+   BACKGROUNDS / SURFACES
+   ========================================================= */
+
+:root {
+  --cw-background: #f6f9fd;
+  --cw-bg: var(--cw-background);
+
+  --cw-surface: #ffffff;
+  --cw-surface-soft: #f8fbff;
+  --cw-surface-elevated: #ffffff;
+  --cw-surface-muted: #f1f5f9;
+
+  --cw-input: #ffffff;
+}
+
+/* =========================================================
+   BORDERS
+   ========================================================= */
+
+:root {
+  --cw-border: #e2e8f0;
+  --cw-border-light: #edf2f7;
+  --cw-border-strong: #cbd5e1;
+}
+
+/* =========================================================
+   STATUS COLORS
+   ========================================================= */
+
+:root {
+  --cw-success: #15803d;
+  --cw-success-bg: #eaf8ef;
+
+  --cw-warning: #d97706;
+  --cw-warning-bg: #fff7e6;
+
+  --cw-danger: #dc2626;
+  --cw-danger-bg: #fff0f0;
+
+  --cw-info: #2563eb;
+  --cw-info-bg: #eff6ff;
+}
+
+/* =========================================================
+   LAYOUT
+   ========================================================= */
+
+:root {
+  --cw-container-width: 1240px;
+  --cw-container: 1240px;
+  --cw-content-width: 1080px;
+  --cw-reading-width: 760px;
+
+  --cw-section-padding: 96px;
+  --cw-section-padding-tablet: 72px;
+  --cw-section-padding-mobile: 56px;
+
+  --cw-grid-gap: 24px;
+  --cw-grid-gap-large: 32px;
+}
+
+/* =========================================================
+   COMPONENT SIZING
+   ========================================================= */
+
+:root {
+  --cw-navbar-height: 76px;
+
+  --cw-button-height: 48px;
+  --cw-button-height-sm: 42px;
+
+  --cw-input-height: 50px;
+
+  --cw-card-padding: 28px;
+  --cw-card-padding-mobile: 22px;
+}
+
+/* =========================================================
+   BORDER RADIUS
+   ========================================================= */
+
+:root {
+  --cw-radius-xs: 6px;
+  --cw-radius-sm: 9px;
+  --cw-radius: 12px;
+  --cw-radius-lg: 16px;
+  --cw-radius-xl: 22px;
+  --cw-radius-2xl: 28px;
+  --cw-radius-round: 999px;
+}
+
+/* =========================================================
+   SHADOWS
+   ========================================================= */
+
+:root {
+  --cw-shadow-xs: 0 2px 8px rgba(15, 42, 82, 0.04);
+
+  --cw-shadow-sm: 0 4px 14px rgba(15, 42, 82, 0.05);
+
+  --cw-shadow: 0 10px 30px rgba(15, 42, 82, 0.08);
+
+  --cw-shadow-lg: 0 18px 50px rgba(15, 42, 82, 0.11);
+
+  --cw-shadow-xl: 0 28px 80px rgba(15, 42, 82, 0.15);
+
+  --cw-shadow-blue: 0 14px 36px rgba(23, 105, 224, 0.2);
+}
+
+/* =========================================================
+   Z-INDEX
+   ========================================================= */
+
+:root {
+  --cw-z-base: 1;
+  --cw-z-dropdown: 100;
+  --cw-z-sticky: 200;
+  --cw-z-modal: 500;
+  --cw-z-toast: 800;
+}
+
+/* =========================================================
+   ANIMATION
+   ========================================================= */
+
+:root {
+  --cw-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --cw-duration-fast: 160ms;
+  --cw-duration-normal: 220ms;
+  --cw-duration-slow: 350ms;
+
+  --cw-transition: var(--cw-duration-normal) ease;
+
+  --cw-transition-slow: var(--cw-duration-slow) ease;
+
+  --cw-hover-lift: translateY(-4px);
+}
+
+/* =========================================================
+   BREAKPOINTS
+   ========================================================= */
+
+:root {
+  --cw-breakpoint-xl: 1280px;
+  --cw-breakpoint-lg: 1100px;
+  --cw-breakpoint-md: 850px;
+  --cw-breakpoint-sm: 650px;
+  --cw-breakpoint-xs: 480px;
+}
+
+/* =========================================================
+   DECORATIVE GRADIENTS
+   ========================================================= */
+
+:root {
+  --cw-gradient-page:
+    radial-gradient(
+      circle at 10% 0%,
+      rgba(23, 105, 224, 0.06),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 90% 10%,
+      rgba(79, 140, 255, 0.05),
+      transparent 25%
+    );
+
+  --cw-gradient-glass: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.9),
+    rgba(255, 255, 255, 0.68)
+  );
+}
+
+/* =========================================================
+   FORM / FOCUS
+   ========================================================= */
+
+:root {
+  --cw-focus-ring: 0 0 0 4px rgba(23, 105, 224, 0.14);
+
+  --cw-focus-border: #1769e0;
+}
+
+/* =========================================================
+   DARK THEME
+   ========================================================= */
+
+[data-theme="dark"] {
+  --cw-background: #07111f;
+  --cw-bg: #07111f;
+
+  --cw-surface: #0d1b2d;
+  --cw-surface-soft: #102238;
+  --cw-surface-elevated: #12263d;
+  --cw-surface-muted: #172b42;
+
+  --cw-input: #0d1b2d;
+
+  --cw-heading: #f1f5f9;
+  --cw-text: #d7e0eb;
+  --cw-muted: #94a3b8;
+  --cw-light-text: #64748b;
+
+  --cw-border: #20354d;
+  --cw-border-light: #1a2d43;
+  --cw-border-strong: #31506e;
+
+  --cw-primary-light: #102d54;
+
+  --cw-success-bg: rgba(21, 128, 61, 0.16);
+
+  --cw-warning-bg: rgba(217, 119, 6, 0.16);
+
+  --cw-danger-bg: rgba(220, 38, 38, 0.16);
+
+  --cw-info-bg: rgba(37, 99, 235, 0.16);
+
+  --cw-gradient-soft: linear-gradient(135deg, #0d1b2d 0%, #102238 100%);
+
+  --cw-gradient-glass: linear-gradient(
+    135deg,
+    rgba(13, 27, 45, 0.92),
+    rgba(16, 34, 56, 0.78)
+  );
+
+  --cw-gradient-page:
+    radial-gradient(circle at 10% 0%, rgba(23, 105, 224, 0.1), transparent 28%),
+    radial-gradient(
+      circle at 90% 10%,
+      rgba(79, 140, 255, 0.08),
+      transparent 25%
+    );
+
+  --cw-shadow-xs: 0 2px 8px rgba(0, 0, 0, 0.18);
+
+  --cw-shadow-sm: 0 4px 14px rgba(0, 0, 0, 0.22);
+
+  --cw-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+
+  --cw-shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.34);
+
+  --cw-shadow-xl: 0 28px 80px rgba(0, 0, 0, 0.42);
+
+  --cw-shadow-blue: 0 14px 36px rgba(23, 105, 224, 0.28);
+}
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --cw-duration-fast: 0ms;
+    --cw-duration-normal: 0ms;
+    --cw-duration-slow: 0ms;
+  }
+}

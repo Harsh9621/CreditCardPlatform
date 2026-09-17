@@ -1,90 +1,99 @@
 package com.cardwise.cardwise.security;
 
-import java.util.List;
+import jakarta.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
 import org.springframework.http.HttpMethod;
+
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import jakarta.servlet.http.HttpServletResponse;
+import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationFilter jwtFilter;
+    private final RateLimitFilter rateLimitFilter;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
-        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    @Value("${CARDWISE_ALLOWED_ORIGINS:http://localhost:5173}")
+    private String allowedOrigins;
+
+    public SecurityConfig(
+            JwtAuthenticationFilter jwtFilter,
+            RateLimitFilter rateLimitFilter
+    ) {
+        this.jwtFilter = jwtFilter;
+        this.rateLimitFilter = rateLimitFilter;
     }
-
-    // =====================================================
-    // SECURITY FILTER CHAIN
-    // =====================================================
 
     @Bean
     public SecurityFilterChain securityFilterChain(
-            HttpSecurity http) throws Exception {
+            HttpSecurity http
+    ) throws Exception {
 
         http
-
-                // =================================================
+                // =====================================================
                 // CORS
-                // =================================================
+                // =====================================================
 
-                .cors(cors -> cors
-                        .configurationSource(corsConfigurationSource())
-                )
+                .cors(cors -> cors.configurationSource(
+                        corsConfigurationSource()
+                ))
 
-                // =================================================
+                // =====================================================
                 // CSRF
-                // =================================================
+                // =====================================================
 
                 .csrf(csrf -> csrf.disable())
 
-                // =================================================
-                // SESSION
-                // =================================================
+                // =====================================================
+                // STATELESS JWT
+                // =====================================================
 
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(
                                 SessionCreationPolicy.STATELESS
                         )
                 )
 
-                // =================================================
+                // =====================================================
                 // EXCEPTION HANDLING
-                // =================================================
+                // =====================================================
 
-                .exceptionHandling(exception -> exception
-
-                        .authenticationEntryPoint(
-                                authenticationEntryPoint()
-                        )
-
-                        .accessDeniedHandler(
-                                accessDeniedHandler()
-                        )
+                .exceptionHandling(exception ->
+                        exception
+                                .authenticationEntryPoint(
+                                        authenticationEntryPoint()
+                                )
+                                .accessDeniedHandler(
+                                        accessDeniedHandler()
+                                )
                 )
 
-                // =================================================
+                // =====================================================
                 // AUTHORIZATION
-                // =================================================
+                // =====================================================
 
                 .authorizeHttpRequests(auth -> auth
 
                         // -------------------------------------------------
-                        // CORS PREFLIGHT REQUESTS
+                        // CORS PREFLIGHT
                         // -------------------------------------------------
 
                         .requestMatchers(
@@ -93,34 +102,43 @@ public class SecurityConfig {
                         ).permitAll()
 
                         // -------------------------------------------------
-                        // PUBLIC ENDPOINTS
+                        // PUBLIC
                         // -------------------------------------------------
 
                         .requestMatchers(
                                 "/",
                                 "/error",
                                 "/api/health",
-                                "/api/auth/**"
+                                "/actuator/health",
+                                "/actuator/health/**",
+                                "/api/auth/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/api-docs/**",
+                                "/v3/api-docs/**"
                         ).permitAll()
 
                         // -------------------------------------------------
-                        // ADMIN APPLICATIONS
+                        // PUBLIC CARD READ
                         // -------------------------------------------------
 
                         .requestMatchers(
-                                "/api/admin/applications/**"
-                        ).hasRole("ADMIN")
+                                HttpMethod.GET,
+                                "/api/cards",
+                                "/api/cards/**"
+                        ).permitAll()
 
                         // -------------------------------------------------
-                        // ADMIN USERS
+                        // PUBLIC CONTACT
                         // -------------------------------------------------
 
                         .requestMatchers(
-                                "/api/admin/users/**"
-                        ).hasRole("ADMIN")
+                                HttpMethod.POST,
+                                "/api/contact"
+                        ).permitAll()
 
                         // -------------------------------------------------
-                        // OTHER ADMIN APIs
+                        // ADMIN
                         // -------------------------------------------------
 
                         .requestMatchers(
@@ -128,16 +146,7 @@ public class SecurityConfig {
                         ).hasRole("ADMIN")
 
                         // -------------------------------------------------
-                        // VIEW CARDS
-                        // -------------------------------------------------
-
-                        .requestMatchers(
-                                HttpMethod.GET,
-                                "/api/cards/**"
-                        ).authenticated()
-
-                        // -------------------------------------------------
-                        // CREATE CARDS
+                        // ADMIN CARD MANAGEMENT
                         // -------------------------------------------------
 
                         .requestMatchers(
@@ -145,18 +154,15 @@ public class SecurityConfig {
                                 "/api/cards/**"
                         ).hasRole("ADMIN")
 
-                        // -------------------------------------------------
-                        // UPDATE CARDS
-                        // -------------------------------------------------
-
                         .requestMatchers(
                                 HttpMethod.PUT,
                                 "/api/cards/**"
                         ).hasRole("ADMIN")
 
-                        // -------------------------------------------------
-                        // DELETE CARDS
-                        // -------------------------------------------------
+                        .requestMatchers(
+                                HttpMethod.PATCH,
+                                "/api/cards/**"
+                        ).hasRole("ADMIN")
 
                         .requestMatchers(
                                 HttpMethod.DELETE,
@@ -164,7 +170,7 @@ public class SecurityConfig {
                         ).hasRole("ADMIN")
 
                         // -------------------------------------------------
-                        // USER APPLICATIONS
+                        // APPLICATIONS
                         // -------------------------------------------------
 
                         .requestMatchers(
@@ -178,26 +184,42 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
 
-                // =================================================
-                // JWT AUTHENTICATION FILTER
-                // =================================================
+                // =====================================================
+                // IMPORTANT FILTER ORDER
+                // =====================================================
+                //
+                // JWT MUST RUN FIRST.
+                //
+                // This ensures RateLimitFilter can see an authenticated
+                // user when required.
+                //
+                // =====================================================
 
                 .addFilterBefore(
-                        jwtAuthenticationFilter,
+                        jwtFilter,
                         UsernamePasswordAuthenticationFilter.class
+                )
+
+                .addFilterAfter(
+                        rateLimitFilter,
+                        JwtAuthenticationFilter.class
                 );
 
         return http.build();
     }
 
-    // =====================================================
-    // 401 - UNAUTHORIZED
-    // =====================================================
+    // =============================================================
+    // 401
+    // =============================================================
 
     @Bean
     public AuthenticationEntryPoint authenticationEntryPoint() {
 
-        return (request, response, authException) -> {
+        return (request, response, exception) -> {
+
+            if (response.isCommitted()) {
+                return;
+            }
 
             response.setStatus(
                     HttpServletResponse.SC_UNAUTHORIZED
@@ -210,26 +232,23 @@ public class SecurityConfig {
             response.setCharacterEncoding("UTF-8");
 
             response.getWriter().write(
-                    "{\"message\":\"Authentication required\"}"
+                    "{\"message\":\"Authentication required.\"}"
             );
         };
     }
 
-    // =====================================================
-    // 403 - FORBIDDEN
-    // =====================================================
+    // =============================================================
+    // 403
+    // =============================================================
 
     @Bean
     public AccessDeniedHandler accessDeniedHandler() {
 
-        return (request, response, accessDeniedException) -> {
+        return (request, response, exception) -> {
 
-            System.out.println(
-                    "ACCESS DENIED: "
-                            + request.getMethod()
-                            + " "
-                            + request.getRequestURI()
-            );
+            if (response.isCommitted()) {
+                return;
+            }
 
             response.setStatus(
                     HttpServletResponse.SC_FORBIDDEN
@@ -242,55 +261,43 @@ public class SecurityConfig {
             response.setCharacterEncoding("UTF-8");
 
             response.getWriter().write(
-                    "{\"message\":\"Access denied. Administrator privileges required.\"}"
+                    "{\"message\":\"Access denied.\"}"
             );
         };
     }
 
-    // =====================================================
-    // CORS CONFIGURATION
-    // =====================================================
+    // =============================================================
+    // CORS
+    // =============================================================
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
-        CorsConfiguration configuration =
+        CorsConfiguration config =
                 new CorsConfiguration();
 
-        // -------------------------------------------------
-        // ALLOWED FRONTENDS
-        // -------------------------------------------------
+        List<String> origins =
+                Arrays.stream(
+                                allowedOrigins.split(",")
+                        )
+                        .map(String::trim)
+                        .filter(origin -> !origin.isBlank())
+                        .toList();
 
-        configuration.setAllowedOrigins(
-                List.of(
-                        // Local Vite frontend
-                        "http://localhost:5173",
+        config.setAllowedOrigins(origins);
 
-                        // Production Vercel frontend
-                        "https://credit-card-platform-silk.vercel.app"
-                )
-        );
-
-        // -------------------------------------------------
-        // ALLOWED HTTP METHODS
-        // -------------------------------------------------
-
-        configuration.setAllowedMethods(
+        config.setAllowedMethods(
                 List.of(
                         "GET",
                         "POST",
                         "PUT",
-                        "DELETE",
                         "PATCH",
+                        "DELETE",
                         "OPTIONS"
                 )
         );
 
-        // -------------------------------------------------
-        // ALLOWED HEADERS
-        // -------------------------------------------------
-
-        configuration.setAllowedHeaders(
+        config.setAllowedHeaders(
                 List.of(
                         "Authorization",
                         "Content-Type",
@@ -300,32 +307,18 @@ public class SecurityConfig {
                 )
         );
 
-        // -------------------------------------------------
-        // EXPOSED HEADERS
-        // -------------------------------------------------
-
-        configuration.setExposedHeaders(
-                List.of(
-                        "Authorization"
-                )
+        config.setExposedHeaders(
+                List.of("Authorization")
         );
 
-        // -------------------------------------------------
-        // CREDENTIALS
-        // -------------------------------------------------
-
-        configuration.setAllowCredentials(true);
-
-        // -------------------------------------------------
-        // APPLY CORS TO ALL ENDPOINTS
-        // -------------------------------------------------
+        config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source =
                 new UrlBasedCorsConfigurationSource();
 
         source.registerCorsConfiguration(
                 "/**",
-                configuration
+                config
         );
 
         return source;

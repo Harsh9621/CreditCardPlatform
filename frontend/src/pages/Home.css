@@ -1,144 +1,188 @@
 /* =========================================================
-   CARDWISE HOME PAGE
-========================================================= */
+   CARDWISE — HOME PAGE
+   Premium Fintech Design System
+   Responsive + Dark Mode
+   ========================================================= */
 
 .home-page {
   min-height: 100vh;
-  overflow-x: hidden;
-
-  background: var(--cw-bg, #ffffff);
-  color: var(--cw-text, #172033);
+  overflow: hidden;
+  color: var(--cw-text);
+  background:
+    var(--cw-gradient-page),
+    var(--cw-background);
 }
 
 /* =========================================================
    HERO
-========================================================= */
+   ========================================================= */
 
 .home-hero {
   position: relative;
+  isolation: isolate;
 
+  width: min(calc(100% - 48px), var(--cw-container-width));
   min-height: 680px;
 
+  margin: 0 auto;
+
   display: grid;
-  grid-template-columns: 1.05fr 0.95fr;
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(440px, 0.9fr);
+
   align-items: center;
+  gap: 50px;
 
-  gap: 45px;
-
-  padding: 75px 6% 90px;
-
-  overflow: hidden;
-
-  background:
-    radial-gradient(
-      circle at 80% 30%,
-      rgba(37, 99, 235, 0.14),
-      transparent 30%
-    ),
-    radial-gradient(
-      circle at 15% 80%,
-      rgba(59, 130, 246, 0.08),
-      transparent 25%
-    ),
-    linear-gradient(180deg, #f8fbff 0%, #eef5ff 100%);
+  padding: 70px 0 85px;
 }
 
 .home-hero::before {
+  position: absolute;
+  top: -100px;
+  right: -180px;
+
+  width: 600px;
+  height: 600px;
+
   content: "";
 
-  position: absolute;
+  background:
+    linear-gradient(
+      rgba(23, 105, 224, 0.035) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(23, 105, 224, 0.035) 1px,
+      transparent 1px
+    );
 
-  width: 320px;
-  height: 320px;
+  background-size: 40px 40px;
 
-  right: -130px;
-  top: -130px;
+  mask-image: radial-gradient(
+    circle,
+    black 0%,
+    transparent 72%
+  );
 
-  border-radius: 50%;
+  -webkit-mask-image: radial-gradient(
+    circle,
+    black 0%,
+    transparent 72%
+  );
 
-  border: 1px solid rgba(37, 99, 235, 0.08);
+  pointer-events: none;
+  z-index: -2;
 }
 
-.home-hero-content {
-  position: relative;
-  z-index: 2;
+.home-hero::after {
+  position: absolute;
+  top: 120px;
+  right: 10%;
 
-  width: min(650px, 100%);
+  width: 420px;
+  height: 420px;
 
-  margin-left: auto;
+  content: "";
+
+  background: radial-gradient(
+    circle,
+    rgba(37, 99, 235, 0.09),
+    transparent 70%
+  );
+
+  filter: blur(12px);
+
+  pointer-events: none;
+  z-index: -1;
 }
 
 /* =========================================================
-   BADGE
-========================================================= */
+   HERO CONTENT
+   ========================================================= */
+
+.home-hero-content {
+  position: relative;
+  z-index: 5;
+
+  max-width: 650px;
+}
 
 .home-badge {
   display: inline-flex;
   align-items: center;
+  gap: 9px;
 
-  padding: 8px 14px;
+  padding: 8px 13px;
 
-  border: 1px solid #d7e6ff;
-  border-radius: 999px;
+  color: var(--cw-primary);
+  background: var(--cw-primary-light);
 
-  color: #1264f5;
-  background: #eaf2ff;
+  border: 1px solid rgba(23, 105, 224, 0.12);
+  border-radius: var(--cw-radius-round);
 
-  font-size: 11px;
-  font-weight: 800;
-
-  letter-spacing: 1.3px;
-
-  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.06);
+  font-size: 0.67rem;
+  font-weight: var(--cw-weight-extrabold);
+  letter-spacing: 0.12em;
+  line-height: 1.2;
 }
 
-/* =========================================================
-   HERO HEADING
-========================================================= */
+.home-badge::before {
+  width: 7px;
+  height: 7px;
+
+  flex: 0 0 auto;
+
+  content: "";
+
+  background: var(--cw-primary);
+  border-radius: 50%;
+
+  box-shadow:
+    0 0 0 4px rgba(23, 105, 224, 0.08);
+}
 
 .home-hero h1 {
-  margin: 20px 0 18px;
+  max-width: 680px;
 
-  color: #162d4a;
+  margin-top: 24px;
 
-  font-size: clamp(44px, 5.2vw, 72px);
+  color: var(--cw-heading);
+  font-family: var(--cw-font-heading);
 
-  line-height: 1.02;
-
-  letter-spacing: -2.8px;
-
-  font-weight: 900;
+  font-size: clamp(3rem, 5vw, 4.6rem);
+  font-weight: var(--cw-weight-extrabold);
+  line-height: 1.04;
+  letter-spacing: -0.06em;
 }
 
 .home-hero h1 span {
-  display: inline;
+  display: block;
 
-  color: #1264f5;
+  margin-top: 5px;
+
+  color: var(--cw-primary);
 }
 
-.home-hero p {
-  max-width: 600px;
+.home-hero-content > p {
+  max-width: 580px;
 
-  margin: 0;
+  margin-top: 25px;
 
-  color: #64748b;
+  color: var(--cw-muted);
 
-  font-size: 17px;
-
+  font-size: 1rem;
   line-height: 1.8;
 }
 
 /* =========================================================
    HERO ACTIONS
-========================================================= */
+   ========================================================= */
 
 .home-actions {
   display: flex;
-
   align-items: center;
-
-  flex-wrap: wrap;
-
   gap: 12px;
 
   margin-top: 32px;
@@ -146,50 +190,52 @@
 
 .home-primary-button,
 .home-secondary-button {
-  display: inline-flex;
+  min-height: var(--cw-button-height);
 
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-
-  gap: 9px;
-
-  min-height: 48px;
+  gap: 10px;
 
   padding: 0 21px;
 
-  border-radius: 10px;
+  border-radius: var(--cw-radius-sm);
 
-  text-decoration: none;
-
-  font-size: 14px;
-  font-weight: 800;
+  font-size: 0.84rem;
+  font-weight: var(--cw-weight-bold);
+  line-height: 1;
 
   transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    background 0.2s ease;
+    transform var(--cw-duration-normal) var(--cw-ease),
+    box-shadow var(--cw-duration-normal) var(--cw-ease),
+    background-color var(--cw-duration-normal) ease,
+    border-color var(--cw-duration-normal) ease,
+    color var(--cw-duration-normal) ease;
 }
 
 .home-primary-button {
-  color: #ffffff;
+  color: var(--cw-white);
 
-  background: linear-gradient(135deg, #1264f5, #0b54d4);
+  background: var(--cw-gradient-brand);
 
-  box-shadow: 0 12px 28px rgba(18, 100, 245, 0.24);
+  box-shadow:
+    0 10px 24px rgba(23, 105, 224, 0.2);
 }
 
 .home-primary-button:hover {
-  transform: translateY(-3px);
+  color: var(--cw-white);
 
-  box-shadow: 0 17px 32px rgba(18, 100, 245, 0.3);
+  transform: translateY(-2px);
 
-  background: linear-gradient(135deg, #0d58dd, #0847b9);
+  box-shadow:
+    0 15px 30px rgba(23, 105, 224, 0.28);
 }
 
 .home-primary-button span {
-  font-size: 17px;
+  font-size: 1.05rem;
 
-  transition: transform 0.2s ease;
+  transition:
+    transform var(--cw-duration-normal) var(--cw-ease);
 }
 
 .home-primary-button:hover span {
@@ -197,423 +243,436 @@
 }
 
 .home-secondary-button {
-  color: #1264f5;
+  color: var(--cw-heading);
 
-  background: #ffffff;
+  background: var(--cw-surface);
 
-  border: 1px solid #cfe0ff;
+  border: 1px solid var(--cw-border);
 
-  box-shadow: 0 7px 20px rgba(20, 55, 100, 0.05);
+  box-shadow: var(--cw-shadow-xs);
 }
 
 .home-secondary-button:hover {
+  color: var(--cw-primary);
+
   transform: translateY(-2px);
 
-  background: #f5f9ff;
+  border-color: rgba(23, 105, 224, 0.3);
 
-  border-color: #a9c8ff;
+  box-shadow: var(--cw-shadow-sm);
 }
 
 /* =========================================================
    HERO STATS
-========================================================= */
+   ========================================================= */
 
 .home-stats {
   display: flex;
-
-  flex-wrap: wrap;
-
-  gap: 35px;
+  align-items: center;
 
   margin-top: 42px;
 }
 
 .home-stat {
-  position: relative;
+  min-width: 120px;
 
-  display: flex;
+  padding-right: 24px;
+  margin-right: 24px;
 
-  flex-direction: column;
+  border-right: 1px solid var(--cw-border);
+}
 
-  gap: 4px;
+.home-stat:last-child {
+  padding-right: 0;
+  margin-right: 0;
+
+  border-right: none;
 }
 
 .home-stat strong {
-  color: #162d4a;
+  display: block;
 
-  font-size: 28px;
+  color: var(--cw-heading);
+  font-family: var(--cw-font-heading);
 
-  font-weight: 900;
+  font-size: 1.35rem;
+  font-weight: var(--cw-weight-extrabold);
+  line-height: 1.2;
+
+  letter-spacing: -0.03em;
 }
 
 .home-stat span {
-  color: #7b8797;
+  display: block;
 
-  font-size: 11px;
+  margin-top: 4px;
 
-  font-weight: 600;
+  color: var(--cw-muted);
+
+  font-size: 0.7rem;
 }
 
 /* =========================================================
    CREDIT CARD AREA
-========================================================= */
+   ========================================================= */
 
 .home-card-area {
   position: relative;
 
-  min-height: 500px;
+  min-height: 540px;
 
   display: flex;
-
   align-items: center;
   justify-content: center;
 }
 
-/* =========================================================
-   CARD GLOW
-========================================================= */
+.home-card-area::before,
+.home-card-area::after {
+  position: absolute;
+
+  content: "";
+
+  border: 1px solid rgba(37, 99, 235, 0.07);
+  border-radius: 50%;
+
+  pointer-events: none;
+}
+
+.home-card-area::before {
+  width: 410px;
+  height: 410px;
+}
+
+.home-card-area::after {
+  width: 510px;
+  height: 510px;
+
+  border-color: rgba(37, 99, 235, 0.04);
+}
 
 .home-card-glow {
   position: absolute;
 
-  width: 390px;
-  height: 390px;
-
-  border-radius: 50%;
+  width: 370px;
+  height: 370px;
 
   background: radial-gradient(
     circle,
-    rgba(37, 99, 235, 0.25),
-    rgba(37, 99, 235, 0.08) 40%,
+    rgba(37, 99, 235, 0.16),
     transparent 70%
   );
 
-  filter: blur(18px);
+  filter: blur(12px);
 
-  animation: homeGlow 5s ease-in-out infinite;
-}
-
-@keyframes homeGlow {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-
-  50% {
-    transform: scale(1.08);
-  }
+  pointer-events: none;
 }
 
 /* =========================================================
    CREDIT CARD
-========================================================= */
+   ========================================================= */
 
 .home-credit-card {
   position: relative;
-  z-index: 2;
+  z-index: 4;
 
-  width: min(440px, 92vw);
+  width: min(445px, 86%);
+  aspect-ratio: 1.59;
 
-  min-height: 270px;
-
-  padding: 28px;
+  padding: 29px;
 
   display: flex;
-
   flex-direction: column;
 
-  justify-content: space-between;
-
-  overflow: hidden;
-
-  border: 1px solid rgba(255, 255, 255, 0.16);
-
-  border-radius: 24px;
-
-  color: #ffffff;
+  color: var(--cw-white);
 
   background:
     radial-gradient(
       circle at 85% 15%,
-      rgba(255, 255, 255, 0.2),
-      transparent 25%
+      rgba(255, 255, 255, 0.13),
+      transparent 28%
     ),
-    radial-gradient(
-      circle at 15% 100%,
-      rgba(255, 255, 255, 0.08),
-      transparent 30%
-    ),
-    linear-gradient(145deg, #082e6f, #1264f5 64%, #2f7bf6);
+    var(--cw-gradient-card);
 
-  box-shadow: 0 30px 65px rgba(7, 50, 120, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--cw-radius-xl);
 
-  transform: rotate(-5deg);
+  box-shadow:
+    0 28px 65px rgba(7, 28, 56, 0.24),
+    0 10px 25px rgba(23, 105, 224, 0.12);
+
+  transform:
+    perspective(1000px)
+    rotateY(-5deg)
+    rotateX(2deg)
+    rotateZ(1.5deg);
 
   transition:
-    transform 0.35s ease,
-    box-shadow 0.35s ease;
+    transform 450ms var(--cw-ease),
+    box-shadow 450ms var(--cw-ease);
 }
 
-.home-credit-card::after {
+.home-credit-card::before {
+  position: absolute;
+  inset: 0;
+
   content: "";
 
-  position: absolute;
+  border-radius: inherit;
 
-  width: 200px;
-  height: 200px;
+  background:
+    linear-gradient(
+      120deg,
+      transparent 20%,
+      rgba(255, 255, 255, 0.07) 45%,
+      transparent 65%
+    );
 
-  right: -80px;
-  bottom: -100px;
-
-  border-radius: 50%;
-
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  pointer-events: none;
 }
 
-.home-credit-card:hover {
-  transform: rotate(-2deg) translateY(-5px);
+.home-card-area:hover .home-credit-card {
+  transform:
+    perspective(1000px)
+    rotateY(0)
+    rotateX(0)
+    rotateZ(0)
+    translateY(-5px);
 
-  box-shadow: 0 38px 75px rgba(7, 50, 120, 0.35);
+  box-shadow:
+    0 38px 75px rgba(7, 28, 56, 0.29),
+    0 14px 32px rgba(23, 105, 224, 0.16);
 }
 
 /* =========================================================
    CARD HEADER
-========================================================= */
+   ========================================================= */
 
 .home-credit-card-header {
+  position: relative;
+  z-index: 2;
+
   display: flex;
-
   align-items: center;
-
   justify-content: space-between;
+}
 
-  font-size: 17px;
-
-  font-weight: 800;
+.home-credit-card-header > span {
+  font-family: var(--cw-font-heading);
+  font-size: 0.86rem;
+  font-weight: var(--cw-weight-bold);
 }
 
 .home-card-bank {
-  width: 45px;
-  height: 45px;
+  width: 42px;
+  height: 42px;
 
   display: flex;
-
   align-items: center;
   justify-content: center;
 
-  border-radius: 12px;
+  color: var(--cw-white);
 
-  color: #1264f5;
+  background: rgba(255, 255, 255, 0.1);
 
-  background: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: var(--cw-radius-sm);
 
-  font-size: 20px;
-  font-weight: 900;
-
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  font-family: var(--cw-font-heading);
+  font-size: 1rem;
+  font-weight: var(--cw-weight-extrabold);
 }
 
 /* =========================================================
-   CHIP
-========================================================= */
+   CARD CHIP
+   ========================================================= */
 
 .home-credit-card-chip {
-  width: 50px;
-  height: 37px;
+  position: relative;
+  z-index: 2;
+
+  width: 48px;
+  height: 35px;
+
+  margin-top: 45px;
 
   display: flex;
-
   align-items: center;
   justify-content: center;
 
-  margin-top: 12px;
+  background: linear-gradient(
+    135deg,
+    #f6dda3,
+    #c99745
+  );
 
-  border-radius: 8px;
-
-  background: linear-gradient(135deg, #d7cf9d, #f8f1bd);
-
-  box-shadow: inset 0 0 0 1px rgba(100, 90, 40, 0.2);
+  border-radius: 7px;
 }
 
 .home-credit-card-chip span {
-  width: 22px;
-  height: 22px;
+  width: 28px;
+  height: 21px;
 
-  border: 1px solid rgba(100, 90, 40, 0.4);
-
+  border: 1px solid rgba(80, 54, 18, 0.4);
   border-radius: 5px;
-
-  background:
-    linear-gradient(
-      90deg,
-      transparent 45%,
-      rgba(100, 90, 40, 0.25) 46%,
-      transparent 50%
-    ),
-    linear-gradient(
-      0deg,
-      transparent 45%,
-      rgba(100, 90, 40, 0.25) 46%,
-      transparent 50%
-    );
 }
 
 /* =========================================================
    CARD NUMBER
-========================================================= */
+   ========================================================= */
 
 .home-credit-card-number {
-  margin-top: 5px;
+  position: relative;
+  z-index: 2;
 
-  font-family: monospace;
+  margin-top: 27px;
 
-  font-size: 18px;
+  font-family: "Courier New", monospace;
+  font-size: clamp(1rem, 2vw, 1.28rem);
+  font-weight: 600;
 
-  letter-spacing: 2px;
-
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  letter-spacing: 0.09em;
+  white-space: nowrap;
 }
 
 /* =========================================================
    CARD FOOTER
-========================================================= */
+   ========================================================= */
 
 .home-credit-card-footer {
+  position: relative;
+  z-index: 2;
+
+  margin-top: auto;
+
   display: flex;
-
+  align-items: flex-end;
   justify-content: space-between;
-
-  gap: 20px;
 }
 
 .home-credit-card-footer div {
   display: flex;
-
   flex-direction: column;
-
-  gap: 5px;
 }
 
 .home-credit-card-footer small {
-  font-size: 8px;
+  color: rgba(255, 255, 255, 0.55);
 
-  opacity: 0.65;
-
-  letter-spacing: 0.7px;
+  font-size: 0.46rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
 }
 
 .home-credit-card-footer strong {
-  font-size: 10px;
+  margin-top: 4px;
 
-  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.95);
+
+  font-size: 0.69rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
 }
-
-/* =========================================================
-   CARD NETWORK
-========================================================= */
 
 .home-card-network {
   position: absolute;
 
   right: 28px;
-  bottom: 26px;
+  bottom: 27px;
 
-  font-size: 22px;
+  color: rgba(255, 255, 255, 0.88);
 
-  font-weight: 900;
-
+  font-size: 0.95rem;
   font-style: italic;
-
-  letter-spacing: -1px;
+  font-weight: 900;
 }
 
 /* =========================================================
    FLOATING INFO CARDS
-========================================================= */
+   ========================================================= */
 
 .home-floating-card {
   position: absolute;
+  z-index: 8;
 
-  z-index: 3;
+  min-width: 145px;
 
-  min-width: 125px;
-
-  padding: 14px;
+  padding: 14px 16px;
 
   display: flex;
-
   flex-direction: column;
 
-  gap: 4px;
+  background: rgba(255, 255, 255, 0.94);
 
-  border: 1px solid #dce7f7;
+  border: 1px solid var(--cw-border);
+  border-radius: var(--cw-radius);
 
-  border-radius: 13px;
+  box-shadow:
+    0 14px 35px rgba(15, 42, 82, 0.1);
 
-  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 
-  box-shadow: 0 15px 35px rgba(15, 45, 80, 0.12);
-
-  backdrop-filter: blur(10px);
-
-  transition:
-    transform 0.25s ease,
-    box-shadow 0.25s ease;
+  animation:
+    home-floating 5s ease-in-out infinite;
 }
 
-.home-floating-card:hover {
-  transform: translateY(-4px);
+.home-floating-card::before {
+  width: 6px;
+  height: 6px;
 
-  box-shadow: 0 20px 42px rgba(15, 45, 80, 0.17);
+  margin-bottom: 8px;
+
+  content: "";
+
+  background: #22c55e;
+  border-radius: 50%;
 }
 
 .home-floating-card span {
-  color: #8a96a7;
+  color: var(--cw-muted);
 
-  font-size: 10px;
-
-  font-weight: 600;
+  font-size: 0.62rem;
+  font-weight: var(--cw-weight-semibold);
 }
 
 .home-floating-card strong {
-  color: #162d4a;
+  margin-top: 3px;
 
-  font-size: 18px;
+  color: var(--cw-heading);
+  font-family: var(--cw-font-heading);
 
-  font-weight: 900;
+  font-size: 1.05rem;
+  font-weight: var(--cw-weight-extrabold);
 }
 
 .home-floating-one {
-  top: 80px;
-
-  right: 4%;
+  top: 90px;
+  left: 0;
 }
 
 .home-floating-two {
-  bottom: 75px;
+  right: 0;
+  bottom: 80px;
 
-  left: 3%;
+  animation-delay: -2.5s;
+}
+
+@keyframes home-floating {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-7px);
+  }
 }
 
 /* =========================================================
-   COMMON SECTIONS
-========================================================= */
-
-.home-features,
-.home-benefits {
-  padding: 90px 6%;
-}
-
-.home-features {
-  background: #ffffff;
-}
-
-.home-benefits {
-  background: linear-gradient(180deg, #f5f8fc, #f8fbff);
-}
+   SECTION HEADING
+   ========================================================= */
 
 .home-section-heading {
-  width: min(700px, 100%);
+  max-width: 720px;
 
   margin: 0 auto 45px;
 
@@ -621,46 +680,60 @@
 }
 
 .home-section-label {
-  color: #1264f5;
+  display: inline-flex;
 
-  font-size: 11px;
+  color: var(--cw-primary);
 
-  font-weight: 800;
+  font-size: 0.66rem;
+  font-weight: var(--cw-weight-extrabold);
 
-  letter-spacing: 1.5px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
 }
 
 .home-section-heading h2 {
-  margin: 10px 0 12px;
+  margin-top: 12px;
 
-  color: #162d4a;
+  color: var(--cw-heading);
+  font-family: var(--cw-font-heading);
 
-  font-size: clamp(30px, 4vw, 42px);
+  font-size: clamp(1.9rem, 3vw, 2.55rem);
+  font-weight: var(--cw-weight-extrabold);
 
   line-height: 1.15;
-
-  letter-spacing: -1px;
+  letter-spacing: -0.045em;
 }
 
 .home-section-heading p {
-  margin: 0;
+  max-width: 580px;
 
-  color: #718096;
+  margin: 14px auto 0;
 
-  line-height: 1.7;
+  color: var(--cw-muted);
+
+  font-size: 0.91rem;
+  line-height: 1.75;
 }
 
 /* =========================================================
-   FEATURE GRID
-========================================================= */
+   FEATURES
+   ========================================================= */
+
+.home-features {
+  padding: 105px 24px;
+
+  background: var(--cw-surface);
+
+  border-top: 1px solid var(--cw-border-light);
+  border-bottom: 1px solid var(--cw-border-light);
+}
 
 .home-feature-grid {
-  width: min(1100px, 100%);
+  width: min(100%, 1180px);
 
-  margin: auto;
+  margin: 0 auto;
 
   display: grid;
-
   grid-template-columns: repeat(3, 1fr);
 
   gap: 20px;
@@ -669,787 +742,788 @@
 .home-feature-card {
   position: relative;
 
-  padding: 30px;
+  min-height: 270px;
 
-  border: 1px solid #e2e8f0;
+  padding: var(--cw-card-padding);
 
-  border-radius: 18px;
+  background: var(--cw-surface);
 
-  background: #ffffff;
+  border: 1px solid var(--cw-border);
+  border-radius: var(--cw-radius-lg);
 
-  box-shadow: 0 12px 32px rgba(20, 55, 100, 0.05);
+  box-shadow: var(--cw-shadow-xs);
 
   transition:
-    transform 0.25s ease,
-    box-shadow 0.25s ease,
-    border-color 0.25s ease;
+    transform var(--cw-duration-normal) var(--cw-ease),
+    border-color var(--cw-duration-normal) ease,
+    box-shadow var(--cw-duration-normal) var(--cw-ease);
 }
 
 .home-feature-card:hover {
-  transform: translateY(-6px);
+  transform: var(--cw-hover-lift);
 
-  border-color: #c9ddff;
+  border-color: rgba(23, 105, 224, 0.22);
 
-  box-shadow: 0 20px 42px rgba(20, 55, 100, 0.1);
+  box-shadow: var(--cw-shadow-lg);
 }
 
 .home-feature-icon {
-  width: 52px;
-  height: 52px;
+  width: 50px;
+  height: 50px;
 
   display: flex;
-
   align-items: center;
   justify-content: center;
 
-  margin-bottom: 18px;
+  background: var(--cw-primary-light);
 
-  border: 1px solid #dce9ff;
+  border: 1px solid rgba(37, 99, 235, 0.08);
+  border-radius: var(--cw-radius);
 
-  border-radius: 14px;
-
-  background: #eaf2ff;
-
-  font-size: 24px;
+  font-size: 1.15rem;
 }
 
 .home-feature-card h3 {
-  margin: 0 0 9px;
+  margin-top: 21px;
 
-  color: #162d4a;
+  color: var(--cw-heading);
+  font-family: var(--cw-font-heading);
 
-  font-size: 20px;
+  font-size: 1rem;
+  font-weight: var(--cw-weight-bold);
 }
 
 .home-feature-card p {
-  min-height: 70px;
+  max-width: 340px;
 
-  margin: 0 0 18px;
+  margin-top: 9px;
 
-  color: #718096;
+  color: var(--cw-muted);
 
-  line-height: 1.6;
-
-  font-size: 13px;
+  font-size: 0.82rem;
+  line-height: 1.75;
 }
 
-.home-feature-card a {
-  color: #1264f5;
+.home-feature-link {
+  display: inline-flex;
 
-  text-decoration: none;
+  margin-top: 20px;
 
-  font-size: 13px;
+  color: var(--cw-primary);
 
-  font-weight: 800;
+  font-size: 0.76rem;
+  font-weight: var(--cw-weight-extrabold);
 
-  transition: color 0.2s ease;
+  transition:
+    color var(--cw-duration-fast) ease;
 }
 
-.home-feature-card a:hover {
-  color: #0847b9;
+.home-feature-link:hover {
+  color: var(--cw-primary-dark);
+
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }
 
 /* =========================================================
    BENEFITS
-========================================================= */
+   ========================================================= */
+
+.home-benefits {
+  padding: 105px 24px;
+
+  background: var(--cw-surface-soft);
+}
 
 .home-benefit-grid {
-  width: min(1100px, 100%);
+  width: min(100%, 1180px);
 
-  margin: auto;
+  margin: 0 auto;
 
   display: grid;
-
   grid-template-columns: repeat(4, 1fr);
 
-  gap: 18px;
+  gap: 16px;
 }
 
 .home-benefit-card {
-  padding: 26px;
+  min-height: 245px;
 
-  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
 
-  border-radius: 16px;
+  padding: 25px;
 
-  background: #ffffff;
+  background: var(--cw-surface);
 
-  box-shadow: 0 8px 25px rgba(20, 55, 100, 0.035);
+  border: 1px solid var(--cw-border);
+  border-radius: var(--cw-radius-lg);
+
+  box-shadow: var(--cw-shadow-xs);
 
   transition:
-    transform 0.25s ease,
-    box-shadow 0.25s ease;
+    transform var(--cw-duration-normal) var(--cw-ease),
+    border-color var(--cw-duration-normal) ease,
+    box-shadow var(--cw-duration-normal) var(--cw-ease);
 }
 
 .home-benefit-card:hover {
-  transform: translateY(-4px);
+  transform: var(--cw-hover-lift);
 
-  box-shadow: 0 15px 32px rgba(20, 55, 100, 0.08);
+  border-color: rgba(23, 105, 224, 0.22);
+
+  box-shadow: var(--cw-shadow-lg);
 }
 
 .home-benefit-icon {
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
 
   display: flex;
-
   align-items: center;
   justify-content: center;
 
-  margin-bottom: 16px;
+  background: var(--cw-primary-light);
 
-  border-radius: 12px;
+  border-radius: var(--cw-radius-sm);
 
-  background: #eef5ff;
-
-  font-size: 24px;
+  font-size: 1rem;
 }
 
 .home-benefit-card h3 {
-  margin: 0 0 7px;
+  margin-top: 19px;
 
-  color: #162d4a;
+  color: var(--cw-heading);
+  font-family: var(--cw-font-heading);
 
-  font-size: 17px;
+  font-size: 0.94rem;
+  font-weight: var(--cw-weight-bold);
 }
 
 .home-benefit-card p {
-  margin: 0;
+  margin-top: 8px;
 
-  color: #718096;
+  color: var(--cw-muted);
 
-  font-size: 13px;
+  font-size: 0.79rem;
+  line-height: 1.7;
+}
 
-  line-height: 1.6;
+.home-benefit-action {
+  margin-top: auto;
+  padding-top: 18px;
+
+  color: var(--cw-primary);
+
+  font-size: 0.72rem;
+  font-weight: var(--cw-weight-extrabold);
 }
 
 /* =========================================================
    CTA
-========================================================= */
+   ========================================================= */
 
 .home-cta {
-  position: relative;
+  padding: 100px 24px;
 
-  padding: 90px 24px;
-
-  overflow: hidden;
-
-  color: #ffffff;
-
-  background:
-    radial-gradient(
-      circle at 80% 20%,
-      rgba(255, 255, 255, 0.14),
-      transparent 28%
-    ),
-    radial-gradient(
-      circle at 10% 90%,
-      rgba(255, 255, 255, 0.08),
-      transparent 25%
-    ),
-    linear-gradient(135deg, #0b3d91, #1264f5);
+  background: var(--cw-surface);
 }
 
 .home-cta-container {
   position: relative;
-  z-index: 2;
+  isolation: isolate;
+  overflow: hidden;
 
-  width: min(850px, 92%);
+  width: min(100%, 1140px);
 
-  margin: auto;
+  margin: 0 auto;
+
+  padding: 75px 30px;
 
   text-align: center;
+
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(79, 140, 255, 0.22),
+      transparent 30%
+    ),
+    var(--cw-gradient-dark);
+
+  border-radius: var(--cw-radius-2xl);
+
+  box-shadow:
+    0 25px 60px rgba(7, 28, 56, 0.18);
 }
 
-.home-cta-container .home-section-label {
-  color: #dbe8ff;
+.home-cta-container::before {
+  position: absolute;
+
+  width: 360px;
+  height: 360px;
+
+  right: -180px;
+  top: -210px;
+
+  content: "";
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+}
+
+.home-cta-container::after {
+  position: absolute;
+
+  width: 300px;
+  height: 300px;
+
+  left: -180px;
+  bottom: -190px;
+
+  content: "";
+
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 50%;
+}
+
+.home-cta-container > * {
+  position: relative;
+  z-index: 2;
+}
+
+.home-cta .home-section-label {
+  color: #b7d2ff;
 }
 
 .home-cta h2 {
-  margin: 14px 0 12px;
+  max-width: 680px;
 
-  font-size: clamp(32px, 4vw, 46px);
+  margin: 14px auto 0;
+
+  color: var(--cw-white);
+  font-family: var(--cw-font-heading);
+
+  font-size: clamp(2rem, 3.8vw, 3rem);
+  font-weight: var(--cw-weight-extrabold);
 
   line-height: 1.1;
-
-  letter-spacing: -1px;
+  letter-spacing: -0.05em;
 }
 
 .home-cta p {
-  max-width: 650px;
+  max-width: 570px;
 
-  margin: 0 auto 27px;
+  margin: 16px auto 0;
 
-  color: #dce8ff;
+  color: rgba(255, 255, 255, 0.7);
 
-  line-height: 1.7;
+  font-size: 0.88rem;
+  line-height: 1.75;
 }
 
 .home-cta-button {
-  display: inline-flex;
+  min-height: var(--cw-button-height);
 
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 9px;
 
-  min-height: 48px;
-
+  margin-top: 28px;
   padding: 0 22px;
 
-  border-radius: 10px;
+  color: var(--cw-heading);
+  background: var(--cw-white);
 
-  color: #1264f5;
+  border-radius: var(--cw-radius-sm);
 
-  background: #ffffff;
+  font-size: 0.8rem;
+  font-weight: var(--cw-weight-extrabold);
 
-  text-decoration: none;
-
-  font-size: 13px;
-
-  font-weight: 800;
-
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.13);
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.15);
 
   transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+    transform var(--cw-duration-normal) var(--cw-ease),
+    box-shadow var(--cw-duration-normal) var(--cw-ease),
+    color var(--cw-duration-normal) ease;
 }
 
 .home-cta-button:hover {
+  color: var(--cw-primary);
+
   transform: translateY(-3px);
 
-  box-shadow: 0 17px 32px rgba(0, 0, 0, 0.18);
-
-  background: #f8fbff;
+  box-shadow:
+    0 15px 32px rgba(0, 0, 0, 0.2);
 }
 
-/* =========================================================
-   FOOTER
-========================================================= */
-
-.home-footer {
-  background: #071529;
-
-  color: #ffffff;
+.home-cta-button span {
+  transition:
+    transform var(--cw-duration-normal) var(--cw-ease);
 }
 
-.home-footer-content {
-  width: min(1100px, 92%);
-
-  margin: auto;
-
-  padding: 55px 0 40px;
-
-  display: grid;
-
-  grid-template-columns: 1.6fr 1fr 1fr;
-
-  gap: 45px;
-}
-
-.home-footer-logo {
-  display: inline-flex;
-
-  align-items: center;
-
-  gap: 9px;
-
-  color: #ffffff;
-
-  text-decoration: none;
-
-  font-size: 20px;
-
-  font-weight: 800;
-}
-
-.home-footer-logo span {
-  width: 35px;
-  height: 35px;
-
-  display: flex;
-
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 9px;
-
-  color: #1264f5;
-
-  background: #ffffff;
-
-  font-weight: 900;
-}
-
-.home-footer-brand p {
-  max-width: 400px;
-
-  margin: 16px 0 0;
-
-  color: #9fb0c8;
-
-  font-size: 13px;
-
-  line-height: 1.7;
-}
-
-.home-footer-column {
-  display: flex;
-
-  flex-direction: column;
-
-  gap: 10px;
-}
-
-.home-footer-column h4 {
-  margin: 0 0 7px;
-
-  color: #ffffff;
-
-  font-size: 13px;
-}
-
-.home-footer-column a {
-  color: #9fb0c8;
-
-  text-decoration: none;
-
-  font-size: 12px;
-
-  transition: color 0.2s ease;
-}
-
-.home-footer-column a:hover {
-  color: #ffffff;
-}
-
-.home-footer-bottom {
-  padding: 18px 20px;
-
-  text-align: center;
-
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-
-  color: #7f90a8;
-
-  font-size: 11px;
+.home-cta-button:hover span {
+  transform: translateX(3px);
 }
 
 /* =========================================================
    DARK MODE
-========================================================= */
+   ========================================================= */
 
 [data-theme="dark"] .home-page {
-  background: #0b1220;
-}
-
-[data-theme="dark"] .home-hero {
   background:
-    radial-gradient(
-      circle at 80% 30%,
-      rgba(37, 99, 235, 0.18),
-      transparent 30%
-    ),
-    linear-gradient(180deg, #0f172a 0%, #0b1220 100%);
+    var(--cw-gradient-page),
+    var(--cw-background);
 }
 
-[data-theme="dark"] .home-badge {
-  color: #60a5fa;
+[data-theme="dark"] .home-features,
+[data-theme="dark"] .home-cta {
+  background: var(--cw-background);
 
-  background: #172033;
-
-  border-color: #334155;
-}
-
-[data-theme="dark"] .home-hero h1,
-[data-theme="dark"] .home-stat strong,
-[data-theme="dark"] .home-feature-card h3,
-[data-theme="dark"] .home-benefit-card h3,
-[data-theme="dark"] .home-floating-card strong,
-[data-theme="dark"] .home-section-heading h2 {
-  color: #f8fafc;
-}
-
-[data-theme="dark"] .home-hero p,
-[data-theme="dark"] .home-stat span,
-[data-theme="dark"] .home-feature-card p,
-[data-theme="dark"] .home-benefit-card p,
-[data-theme="dark"] .home-section-heading p {
-  color: #94a3b8;
-}
-
-[data-theme="dark"] .home-secondary-button,
-[data-theme="dark"] .home-floating-card {
-  background: #111827;
-
-  border-color: #334155;
-
-  color: #60a5fa;
-}
-
-[data-theme="dark"] .home-secondary-button:hover {
-  background: #172033;
-}
-
-[data-theme="dark"] .home-features {
-  background: #0b1220;
+  border-color: var(--cw-border);
 }
 
 [data-theme="dark"] .home-benefits {
-  background: #0f172a;
+  background: var(--cw-surface-soft);
 }
 
 [data-theme="dark"] .home-feature-card,
-[data-theme="dark"] .home-benefit-card {
-  background: #111827;
-
-  border-color: #243244;
+[data-theme="dark"] .home-benefit-card,
+[data-theme="dark"] .home-secondary-button {
+  background: var(--cw-surface);
+  border-color: var(--cw-border);
 }
 
 [data-theme="dark"] .home-feature-card:hover,
 [data-theme="dark"] .home-benefit-card:hover {
-  border-color: #365276;
+  border-color: rgba(79, 140, 255, 0.35);
 }
 
-[data-theme="dark"] .home-feature-icon,
-[data-theme="dark"] .home-benefit-icon {
-  background: #172033;
-
-  border-color: #263c59;
+[data-theme="dark"] .home-floating-card {
+  background: rgba(14, 27, 45, 0.95);
+  border-color: var(--cw-border);
 }
 
-[data-theme="dark"] .home-floating-card span {
-  color: #94a3b8;
+[data-theme="dark"] .home-floating-card strong {
+  color: var(--cw-heading);
 }
 
 /* =========================================================
-   LARGE TABLET
-========================================================= */
+   1100px
+   ========================================================= */
 
-@media (max-width: 1050px) {
+@media (max-width: 1100px) {
   .home-hero {
-    grid-template-columns: 1fr;
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(390px, 0.9fr);
 
-    padding-top: 60px;
+    gap: 30px;
   }
 
-  .home-hero-content {
-    margin: auto;
+  .home-hero h1 {
+    font-size: clamp(2.75rem, 5vw, 4rem);
+  }
+
+  .home-card-area {
+    min-height: 500px;
+  }
+
+  .home-credit-card {
+    width: 405px;
+  }
+
+  .home-benefit-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* =========================================================
+   850px
+   ========================================================= */
+
+@media (max-width: 850px) {
+  .home-hero {
+    width: min(calc(100% - 36px), 700px);
+
+    grid-template-columns: 1fr;
+
+    min-height: auto;
+
+    padding: 60px 0 70px;
 
     text-align: center;
   }
 
-  .home-hero p {
-    margin: auto;
+  .home-hero-content {
+    max-width: 700px;
+
+    margin: 0 auto;
   }
 
-  .home-actions,
+  .home-hero-content > p {
+    margin-inline: auto;
+  }
+
+  .home-actions {
+    justify-content: center;
+  }
+
   .home-stats {
     justify-content: center;
   }
 
   .home-card-area {
-    min-height: 430px;
-  }
+    min-height: 490px;
 
-  .home-feature-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .home-benefit-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-/* =========================================================
-   TABLET / MOBILE
-========================================================= */
-
-@media (max-width: 700px) {
-  .home-hero {
-    padding: 45px 18px 65px;
-  }
-
-  .home-hero h1 {
-    font-size: 42px;
-
-    letter-spacing: -1.8px;
-  }
-
-  .home-hero p {
-    font-size: 15px;
-  }
-
-  .home-stats {
-    gap: 22px;
-  }
-
-  .home-card-area {
-    min-height: 360px;
+    margin-top: 5px;
   }
 
   .home-credit-card {
-    min-height: 235px;
-
-    padding: 22px;
-
-    border-radius: 20px;
-  }
-
-  .home-credit-card-number {
-    font-size: 14px;
+    width: min(450px, 74%);
   }
 
   .home-floating-one {
-    top: 25px;
-
-    right: 0;
+    left: 5%;
   }
 
   .home-floating-two {
-    bottom: 25px;
-
-    left: 0;
+    right: 5%;
   }
 
-  .home-features,
-  .home-benefits {
-    padding: 65px 18px;
-  }
+  .home-feature-grid {
+    max-width: 650px;
 
-  .home-feature-grid,
-  .home-benefit-grid {
     grid-template-columns: 1fr;
-  }
 
-  .home-section-heading h2 {
-    font-size: 30px;
-  }
-
-  .home-footer-content {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .home-footer-brand {
-    grid-column: 1 / -1;
+    margin-inline: auto;
   }
 }
 
 /* =========================================================
-   SMALL MOBILE
-========================================================= */
+   650px
+   ========================================================= */
 
-@media (max-width: 600px) {
+@media (max-width: 650px) {
   .home-hero {
-    min-height: auto;
+    width: calc(100% - 28px);
 
-    padding: 35px 16px 55px;
+    padding: 48px 0 55px;
   }
 
-  .home-hero-content {
-    width: 100%;
+  .home-badge {
+    font-size: 0.58rem;
   }
 
   .home-hero h1 {
-    font-size: clamp(36px, 10vw, 48px);
+    margin-top: 19px;
+
+    font-size: clamp(2.25rem, 10vw, 3rem);
+
+    letter-spacing: -0.055em;
+  }
+
+  .home-hero-content > p {
+    margin-top: 19px;
+
+    font-size: 0.88rem;
   }
 
   .home-actions {
-    width: 100%;
+    flex-direction: column;
+
+    margin-top: 27px;
   }
 
   .home-primary-button,
   .home-secondary-button {
-    width: 100%;
+    width: min(100%, 310px);
+  }
+
+  .home-stats {
+    margin-top: 34px;
+  }
+
+  .home-stat {
+    min-width: auto;
+
+    padding-right: 13px;
+    margin-right: 13px;
+  }
+
+  .home-stat strong {
+    font-size: 1.08rem;
+  }
+
+  .home-stat span {
+    font-size: 0.59rem;
   }
 
   .home-card-area {
-    min-height: 300px;
+    min-height: 385px;
+  }
+
+  .home-card-area::before {
+    width: 315px;
+    height: 315px;
+  }
+
+  .home-card-area::after {
+    width: 385px;
+    height: 385px;
+  }
+
+  .home-credit-card {
+    width: 88%;
+
+    padding: 22px;
+
+    border-radius: var(--cw-radius-lg);
+
+    transform:
+      perspective(900px)
+      rotateY(-3deg)
+      rotateZ(1deg);
+  }
+
+  .home-card-area:hover .home-credit-card {
+    transform:
+      perspective(900px)
+      rotateY(0)
+      rotateZ(0)
+      translateY(-4px);
+  }
+
+  .home-credit-card-chip {
+    width: 41px;
+    height: 30px;
+
+    margin-top: 28px;
+  }
+
+  .home-credit-card-number {
+    margin-top: 19px;
+
+    font-size: 0.83rem;
+
+    letter-spacing: 0.055em;
+  }
+
+  .home-card-network {
+    right: 20px;
+    bottom: 19px;
+
+    font-size: 0.78rem;
+  }
+
+  .home-floating-card {
+    min-width: 112px;
+
+    padding: 10px 11px;
+  }
+
+  .home-floating-card span {
+    font-size: 0.55rem;
+  }
+
+  .home-floating-card strong {
+    font-size: 0.83rem;
+  }
+
+  .home-floating-one {
+    top: 32px;
+    left: 0;
+  }
+
+  .home-floating-two {
+    right: 0;
+    bottom: 27px;
+  }
+
+  .home-features,
+  .home-benefits {
+    padding: 72px 14px;
+  }
+
+  .home-section-heading {
+    margin-bottom: 34px;
+  }
+
+  .home-section-heading h2 {
+    font-size: 1.8rem;
+  }
+
+  .home-section-heading p {
+    font-size: 0.83rem;
+  }
+
+  .home-feature-card {
+    min-height: auto;
+
+    padding: var(--cw-card-padding-mobile);
+  }
+
+  .home-benefit-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .home-benefit-card {
+    min-height: 215px;
+  }
+
+  .home-cta {
+    padding: 72px 14px;
+  }
+
+  .home-cta-container {
+    padding: 55px 20px;
+
+    border-radius: var(--cw-radius-xl);
+  }
+
+  .home-cta h2 {
+    font-size: 1.95rem;
+  }
+
+  .home-cta p {
+    font-size: 0.81rem;
+  }
+
+  .home-cta-button {
+    width: min(100%, 300px);
+  }
+}
+
+/* =========================================================
+   400px
+   ========================================================= */
+
+@media (max-width: 400px) {
+  .home-hero {
+    width: calc(100% - 22px);
+  }
+
+  .home-badge {
+    padding: 7px 10px;
+
+    font-size: 0.55rem;
+  }
+
+  .home-hero h1 {
+    font-size: 2.12rem;
+  }
+
+  .home-card-area {
+    min-height: 325px;
   }
 
   .home-credit-card {
     width: 94%;
 
-    min-height: 205px;
+    padding: 17px;
 
-    padding: 20px;
+    border-radius: var(--cw-radius);
+  }
+
+  .home-card-bank {
+    width: 34px;
+    height: 34px;
+
+    font-size: 0.84rem;
+  }
+
+  .home-credit-card-header > span {
+    font-size: 0.7rem;
+  }
+
+  .home-credit-card-chip {
+    width: 34px;
+    height: 25px;
+
+    margin-top: 20px;
   }
 
   .home-credit-card-number {
-    font-size: 12px;
+    margin-top: 14px;
 
-    letter-spacing: 1px;
+    font-size: 0.63rem;
+
+    letter-spacing: 0.045em;
+  }
+
+  .home-credit-card-footer small {
+    font-size: 0.38rem;
+  }
+
+  .home-credit-card-footer strong {
+    font-size: 0.53rem;
   }
 
   .home-card-network {
-    right: 20px;
+    right: 16px;
+    bottom: 16px;
 
-    bottom: 20px;
-
-    font-size: 18px;
+    font-size: 0.65rem;
   }
 
-  .home-floating-one {
-    right: -2px;
+  .home-floating-card {
+    min-width: 92px;
 
-    top: 15px;
+    padding: 8px 9px;
   }
 
-  .home-floating-two {
-    left: -2px;
-
-    bottom: 10px;
+  .home-floating-card span {
+    font-size: 0.5rem;
   }
 
-  .home-feature-card,
-  .home-benefit-card {
-    padding: 22px;
+  .home-floating-card strong {
+    font-size: 0.7rem;
   }
 
-  .home-footer-content {
-    padding: 40px 0 30px;
+  .home-stat {
+    padding-right: 8px;
+    margin-right: 8px;
+  }
+
+  .home-stat strong {
+    font-size: 0.9rem;
+  }
+
+  .home-stat span {
+    font-size: 0.51rem;
   }
 }
 
 /* =========================================================
-   VERY SMALL MOBILE
-========================================================= */
+   ACCESSIBILITY
+   ========================================================= */
 
-@media (max-width: 400px) {
-  .home-hero h1 {
-    font-size: 35px;
-  }
+.home-primary-button:focus-visible,
+.home-secondary-button:focus-visible,
+.home-feature-link:focus-visible,
+.home-benefit-card:focus-visible,
+.home-cta-button:focus-visible {
+  outline: 3px solid rgba(23, 105, 224, 0.25);
+  outline-offset: 3px;
+}
 
-  .home-stats {
-    display: grid;
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
 
-    grid-template-columns: repeat(3, 1fr);
-
-    gap: 8px;
-  }
-
-  .home-stat strong {
-    font-size: 20px;
-  }
-
-  .home-stat span {
-    font-size: 8px;
-  }
-
-  .home-card-area {
-    min-height: 270px;
-  }
-
-  .home-credit-card {
-    min-height: 190px;
-
-    padding: 17px;
-
-    border-radius: 18px;
-  }
-
-  .home-card-bank {
-    width: 38px;
-    height: 38px;
-
-    font-size: 17px;
-  }
-
-  .home-credit-card-header {
-    font-size: 14px;
-  }
-
-  .home-credit-card-chip {
-    width: 43px;
-    height: 31px;
-  }
-
-  .home-credit-card-number {
-    font-size: 10px;
-  }
-
-  .home-credit-card-footer strong {
-    font-size: 8px;
+@media (prefers-reduced-motion: reduce) {
+  .home-credit-card,
+  .home-floating-card,
+  .home-feature-card,
+  .home-benefit-card,
+  .home-primary-button,
+  .home-secondary-button,
+  .home-cta-button {
+    transition: none !important;
   }
 
   .home-floating-card {
-    min-width: 90px;
-
-    padding: 9px;
+    animation: none !important;
   }
-
-  .home-floating-card span {
-    font-size: 8px;
-  }
-
-  .home-floating-card strong {
-    font-size: 14px;
-  }
-
-  .home-footer-content {
-    grid-template-columns: 1fr;
-  }
-
-  .home-footer-brand {
-    grid-column: auto;
-  }
-}
-
-/* =========================================
-   CLICKABLE HOME CARDS
-========================================= */
-
-.home-feature-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  color: #1264f5;
-  text-decoration: none;
-  font-size: 13px;
-  font-weight: 800;
-  transition: 0.2s ease;
-}
-
-.home-feature-link:hover {
-  transform: translateX(4px);
-  color: #0847b9;
-}
-
-/* Benefit cards are now clickable */
-
-.home-benefit-link-card {
-  display: block;
-  color: inherit;
-  text-decoration: none;
-  cursor: pointer;
-  transition: 0.25s ease;
-}
-
-.home-benefit-link-card:hover {
-  transform: translateY(-5px);
-  border-color: #c7dcff;
-  box-shadow: 0 15px 35px rgba(20, 55, 100, 0.1);
-}
-
-.home-benefit-action {
-  display: inline-flex;
-  margin-top: 16px;
-  color: #1264f5;
-  font-size: 12px;
-  font-weight: 800;
-  transition: 0.2s ease;
-}
-
-.home-benefit-link-card:hover .home-benefit-action {
-  transform: translateX(4px);
-}
-
-/* Dark mode */
-
-[data-theme="dark"] .home-benefit-link-card:hover {
-  border-color: #3b82f6;
-}
-
-[data-theme="dark"] .home-feature-link,
-[data-theme="dark"] .home-benefit-action {
-  color: #60a5fa;
 }

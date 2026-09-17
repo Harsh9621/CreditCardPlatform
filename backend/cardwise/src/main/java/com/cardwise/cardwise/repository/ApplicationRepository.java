@@ -1,7 +1,8 @@
 package com.cardwise.cardwise.repository;
 
 import com.cardwise.cardwise.entity.Application;
-
+import com.cardwise.cardwise.entity.enums.ApplicationStatus;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -9,50 +10,46 @@ import java.util.List;
 public interface ApplicationRepository
         extends JpaRepository<Application, Long> {
 
-    // =====================================================
-    // GET ALL APPLICATIONS
-    // =====================================================
+    @EntityGraph(attributePaths = {
+            "user",
+            "creditCard",
+            "reviewedBy"
+    })
+    List<Application> findAllByOrderByAppliedAtDesc();
 
-    List<Application>
-    findAllByOrderByAppliedAtDesc();
-
-
-    // =====================================================
-    // GET USER APPLICATIONS
-    // =====================================================
-
-    List<Application>
-    findByUserIdOrderByAppliedAtDesc(
+    @EntityGraph(attributePaths = {
+            "user",
+            "creditCard",
+            "reviewedBy"
+    })
+    List<Application> findByUserIdOrderByAppliedAtDesc(
             Long userId
     );
 
-
-    // =====================================================
-    // GET APPLICATIONS BY CREDIT CARD
-    // =====================================================
-
-    List<Application>
-    findByCreditCardIdOrderByAppliedAtDesc(
+    @EntityGraph(attributePaths = {
+            "user",
+            "creditCard",
+            "reviewedBy"
+    })
+    List<Application> findByCreditCardIdOrderByAppliedAtDesc(
             Long creditCardId
     );
 
-
-    // =====================================================
-    // GET APPLICATIONS BY STATUS
-    // =====================================================
-
-    List<Application>
-    findByStatusIgnoreCaseOrderByAppliedAtDesc(
-            String status
+    @EntityGraph(attributePaths = {
+            "user",
+            "creditCard",
+            "reviewedBy"
+    })
+    List<Application> findByStatusOrderByAppliedAtDesc(
+            ApplicationStatus status
     );
 
-
-    // =====================================================
-    // GET LATEST APPLICATION
-    // =====================================================
-
-    Application
-    findFirstByUserIdAndCreditCardIdOrderByAppliedAtDesc(
+    @EntityGraph(attributePaths = {
+            "user",
+            "creditCard",
+            "reviewedBy"
+    })
+    Application findFirstByUserIdAndCreditCardIdOrderByAppliedAtDesc(
             Long userId,
             Long creditCardId
     );

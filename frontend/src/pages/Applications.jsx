@@ -1,73 +1,134 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+
 import api from "../services/api";
 import "./Applications.css";
 
 function Applications() {
+  const navigate = useNavigate();
+
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
+
+  const loadApplications = useCallback(
+    async (isRefresh = false) => {
+      try {
+        if (isRefresh) {
+          setRefreshing(true);
+        } else {
+          setLoading(true);
+        }
+
+        setError("");
+
+        const savedUser = localStorage.getItem("user");
+
+        if (!savedUser) {
+          setError("Please login to view your applications.");
+          setApplications([]);
+          return;
+        }
+
+        let user;
+
+        try {
+          user = JSON.parse(savedUser);
+        } catch {
+          localStorage.removeItem("user");
+          localStorage.removeItem("token");
+
+          setError("Your login session is invalid. Please login again.");
+          setApplications([]);
+          return;
+        }
+
+        if (!user?.id) {
+          setError("User information is missing. Please login again.");
+          setApplications([]);
+          return;
+        }
+
+        const response = await api.get(`/applications/user/${user.id}`);
+
+        const responseData = response.data;
+
+        const data = Array.isArray(responseData)
+          ? responseData
+          : responseData
+            ? [responseData]
+            : [];
+
+        const sortedApplications = [...data].sort(
+          (a, b) =>
+            new Date(b?.appliedAt || 0).getTime() -
+            new Date(a?.appliedAt || 0).getTime(),
+        );
+
+        setApplications(sortedApplications);
+      } catch (err) {
+        console.error("Applications error:", err);
+
+        if (err.response?.status === 401) {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+
+          navigate("/login", {
+            replace: true,
+            state: {
+              from: "/applications",
+            },
+          });
+
+          return;
+        }
+
+        setError(
+          err.response?.data?.message ||
+            err.response?.data?.error ||
+            "Unable to load your applications.",
+        );
+      } finally {
+        setLoading(false);
+        setRefreshing(false);
+      }
+    },
+    [navigate],
+  );
 
   useEffect(() => {
     loadApplications();
-  }, []);
+  }, [loadApplications]);
 
-  const loadApplications = async () => {
-    try {
-      setLoading(true);
-      setError("");
+  const summary = useMemo(() => {
+    return applications.reduce(
+      (counts, application) => {
+        const status = String(application?.status || "PENDING").toUpperCase();
 
-      const savedUser = localStorage.getItem("user");
+        counts.total += 1;
 
-      if (!savedUser) {
-        setError("Please login to view your applications.");
-        return;
-      }
+        if (status === "APPROVED") {
+          counts.approved += 1;
+        } else if (status === "REJECTED") {
+          counts.rejected += 1;
+        } else {
+          counts.pending += 1;
+        }
 
-      const user = JSON.parse(savedUser);
-
-      if (!user?.id) {
-        setError("User information is missing. Please login again.");
-        return;
-      }
-
-      const response = await api.get(`/applications/user/${user.id}`);
-
-      const data = Array.isArray(response.data)
-        ? response.data
-        : response.data
-          ? [response.data]
-          : [];
-
-      // Latest applications first
-      data.sort(
-        (a, b) => new Date(b.appliedAt || 0) - new Date(a.appliedAt || 0),
-      );
-
-      setApplications(data);
-    } catch (err) {
-      console.error("Applications error:", err);
-
-      if (err.response?.status === 401) {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        window.location.href = "/login";
-        return;
-      }
-
-      setError(
-        err.response?.data?.message || "Unable to load your applications.",
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // =====================================================
-  // STATUS
-  // =====================================================
+        return counts;
+      },
+      {
+        total: 0,
+        pending: 0,
+        approved: 0,
+        rejected: 0,
+      },
+    );
+  }, [applications]);
 
   const getStatusClass = (status) => {
-    switch (status?.toUpperCase()) {
+    switch (String(status || "").toUpperCase()) {
       case "APPROVED":
         return "approved";
 
@@ -80,7 +141,7 @@ function Applications() {
   };
 
   const getStatusIcon = (status) => {
-    switch (status?.toUpperCase()) {
+    switch (String(status || "").toUpperCase()) {
       case "APPROVED":
         return "✓";
 
@@ -93,7 +154,7 @@ function Applications() {
   };
 
   const getStatusText = (status) => {
-    switch (status?.toUpperCase()) {
+    switch (String(status || "").toUpperCase()) {
       case "APPROVED":
         return "Application Approved";
 
@@ -105,14 +166,29 @@ function Applications() {
     }
   };
 
-  // =====================================================
-  // DATE
-  // =====================================================
+  const getStatusDescription = (status) => {
+    switch (String(status || "").toUpperCase()) {
+      case "APPROVED":
+        return "Congratulations! Your credit card application has been approved.";
+
+      case "REJECTED":
+        return "Unfortunately, your application was not approved at this time.";
+
+      default:
+        return "Your application has been received and is currently being reviewed by our team.";
+    }
+  };
 
   const formatDate = (date) => {
     if (!date) return "N/A";
 
-    return new Date(date).toLocaleDateString("en-IN", {
+    const parsedDate = new Date(date);
+
+    if (Number.isNaN(parsedDate.getTime())) {
+      return "N/A";
+    }
+
+    return parsedDate.toLocaleDateString("en-IN", {
       day: "2-digit",
       month: "short",
       year: "numeric",
@@ -122,21 +198,32 @@ function Applications() {
   const formatTime = (date) => {
     if (!date) return "";
 
-    return new Date(date).toLocaleTimeString("en-IN", {
+    const parsedDate = new Date(date);
+
+    if (Number.isNaN(parsedDate.getTime())) {
+      return "";
+    }
+
+    return parsedDate.toLocaleTimeString("en-IN", {
       hour: "2-digit",
       minute: "2-digit",
     });
   };
 
-  // =====================================================
-  // LOADING
-  // =====================================================
+  const getBankInitial = (bank) => {
+    return (
+      String(bank || "CardWise")
+        .trim()
+        .charAt(0)
+        .toUpperCase() || "C"
+    );
+  };
 
   if (loading) {
     return (
       <div className="applications-page">
         <div className="applications-loading">
-          <div className="applications-loader"></div>
+          <div className="applications-loader" aria-hidden="true"></div>
 
           <h2>Loading Applications...</h2>
 
@@ -146,10 +233,6 @@ function Applications() {
     );
   }
 
-  // =====================================================
-  // PAGE
-  // =====================================================
-
   return (
     <div className="applications-page">
       {/* =================================================
@@ -158,7 +241,7 @@ function Applications() {
 
       <section className="applications-hero">
         <div className="applications-hero-content">
-          <div>
+          <div className="applications-hero-copy">
             <span className="applications-eyebrow">CARDWISE ACCOUNT</span>
 
             <h1>My Applications</h1>
@@ -169,7 +252,9 @@ function Applications() {
             </p>
           </div>
 
-          <div className="applications-hero-icon">📋</div>
+          <div className="applications-hero-icon" aria-hidden="true">
+            📋
+          </div>
         </div>
       </section>
 
@@ -182,77 +267,73 @@ function Applications() {
           {/* ERROR */}
 
           {error && (
-            <div className="applications-error">
-              <span>!</span>
+            <div className="applications-error" role="alert">
+              <span aria-hidden="true">!</span>
 
               <div>
                 <strong>Unable to load applications</strong>
+
                 <p>{error}</p>
+
+                <button
+                  type="button"
+                  className="applications-retry"
+                  onClick={() => loadApplications()}
+                >
+                  Try Again
+                </button>
               </div>
             </div>
           )}
 
-          {/* =================================================
-              SUMMARY
-          ================================================= */}
-
           {!error && (
             <>
+              {/* =================================================
+                  SUMMARY
+              ================================================= */}
+
               <div className="applications-summary">
                 <div className="summary-card">
-                  <div className="summary-icon total">📋</div>
+                  <div className="summary-icon total" aria-hidden="true">
+                    📋
+                  </div>
 
                   <div>
                     <span>Total Applications</span>
-                    <strong>{applications.length}</strong>
+                    <strong>{summary.total}</strong>
                   </div>
                 </div>
 
                 <div className="summary-card">
-                  <div className="summary-icon pending">⏳</div>
+                  <div className="summary-icon pending" aria-hidden="true">
+                    ⏳
+                  </div>
 
                   <div>
                     <span>Pending</span>
-
-                    <strong>
-                      {
-                        applications.filter(
-                          (app) => app.status?.toUpperCase() === "PENDING",
-                        ).length
-                      }
-                    </strong>
+                    <strong>{summary.pending}</strong>
                   </div>
                 </div>
 
                 <div className="summary-card">
-                  <div className="summary-icon approved">✓</div>
+                  <div className="summary-icon approved" aria-hidden="true">
+                    ✓
+                  </div>
 
                   <div>
                     <span>Approved</span>
-
-                    <strong>
-                      {
-                        applications.filter(
-                          (app) => app.status?.toUpperCase() === "APPROVED",
-                        ).length
-                      }
-                    </strong>
+                    <strong>{summary.approved}</strong>
                   </div>
                 </div>
 
                 <div className="summary-card">
-                  <div className="summary-icon rejected">×</div>
+                  <div className="summary-icon rejected" aria-hidden="true">
+                    ×
+                  </div>
 
                   <div>
                     <span>Rejected</span>
-
-                    <strong>
-                      {
-                        applications.filter(
-                          (app) => app.status?.toUpperCase() === "REJECTED",
-                        ).length
-                      }
-                    </strong>
+                    <strong>{summary.rejected}</strong>
                   </div>
                 </div>
               </div>
@@ -271,10 +352,19 @@ function Applications() {
                 </div>
 
                 <button
+                  type="button"
                   className="refresh-applications"
-                  onClick={loadApplications}
+                  onClick={() => loadApplications(true)}
+                  disabled={refreshing}
                 >
-                  ↻ Refresh
+                  <span
+                    className={refreshing ? "is-refreshing" : ""}
+                    aria-hidden="true"
+                  >
+                    ↻
+                  </span>
+
+                  {refreshing ? "Refreshing..." : "Refresh"}
                 </button>
               </div>
 
@@ -284,7 +374,11 @@ function Applications() {
 
               {applications.length === 0 ? (
                 <div className="applications-empty">
-                  <div className="empty-icon">💳</div>
+                  <div className="empty-icon" aria-hidden="true">
+                    💳
+                  </div>
+
+                  <span className="empty-eyebrow">CARDWISE APPLICATIONS</span>
 
                   <h2>No Applications Yet</h2>
 
@@ -293,33 +387,47 @@ function Applications() {
                     available cards and find the right one for you.
                   </p>
 
-                  <a href="/cards">Explore Credit Cards →</a>
+                  <Link to="/cards">
+                    Explore Credit Cards
+                    <span aria-hidden="true">→</span>
+                  </Link>
                 </div>
               ) : (
                 /* =================================================
-                    APPLICATION CARDS
+                    APPLICATION LIST
                 ================================================= */
 
                 <div className="applications-list">
                   {applications.map((application) => {
-                    const card = application.creditCard || {};
+                    const card = application?.creditCard || {};
 
-                    const status =
-                      application.status?.toUpperCase() || "PENDING";
+                    const status = String(
+                      application?.status || "PENDING",
+                    ).toUpperCase();
 
                     const statusClass = getStatusClass(status);
+
+                    const bankInitial = getBankInitial(card.bank);
 
                     return (
                       <article
                         className={`application-card ${statusClass}`}
-                        key={application.id}
+                        key={
+                          application.id ||
+                          `${card.id}-${application.appliedAt}`
+                        }
                       >
-                        {/* TOP */}
+                        {/* =================================================
+                            TOP
+                        ================================================= */}
 
                         <div className="application-card-top">
                           <div className="application-card-title">
-                            <div className="application-card-icon">
-                              {card.bank?.charAt(0) || "C"}
+                            <div
+                              className="application-card-icon"
+                              aria-hidden="true"
+                            >
+                              {bankInitial}
                             </div>
 
                             <div>
@@ -334,32 +442,39 @@ function Applications() {
                           </div>
 
                           <div className={`application-status ${statusClass}`}>
-                            <span>{getStatusIcon(status)}</span>
+                            <span aria-hidden="true">
+                              {getStatusIcon(status)}
+                            </span>
 
                             {status}
                           </div>
                         </div>
 
-                        {/* CARD VISUAL */}
+                        {/* =================================================
+                            CARD VISUAL
+                        ================================================= */}
 
                         <div
                           className={`application-credit-card ${statusClass}`}
                         >
                           <div className="application-card-brand">
-                            <div className="application-bank-circle">
-                              {card.bank?.charAt(0) || "C"}
+                            <div
+                              className="application-bank-circle"
+                              aria-hidden="true"
+                            >
+                              {bankInitial}
                             </div>
 
                             <span>{card.bank || "CardWise"}</span>
                           </div>
 
-                          <div className="application-chip">
+                          <div className="application-chip" aria-hidden="true">
                             <span></span>
                           </div>
 
                           <div className="application-card-number">
-                            •••• &nbsp; •••• &nbsp; •••• &nbsp;{" "}
-                            {String(application.id).padStart(4, "0")}
+                            •••• &nbsp; •••• &nbsp; •••• &nbsp;
+                            {String(application.id || 0).padStart(4, "0")}
                           </div>
 
                           <div className="application-card-bottom">
@@ -376,36 +491,39 @@ function Applications() {
                             </div>
                           </div>
 
-                          <div className="application-card-logo">CW</div>
+                          <div
+                            className="application-card-logo"
+                            aria-hidden="true"
+                          >
+                            CW
+                          </div>
                         </div>
 
-                        {/* STATUS MESSAGE */}
+                        {/* =================================================
+                            STATUS MESSAGE
+                        ================================================= */}
 
                         <div
                           className={`application-status-message ${statusClass}`}
                         >
-                          <div>{getStatusIcon(status)}</div>
+                          <div aria-hidden="true">{getStatusIcon(status)}</div>
 
                           <div>
                             <strong>{getStatusText(status)}</strong>
 
-                            <p>
-                              {status === "APPROVED"
-                                ? "Congratulations! Your credit card application has been approved."
-                                : status === "REJECTED"
-                                  ? "Unfortunately, your application was not approved at this time."
-                                  : "Your application has been received and is currently being reviewed by our team."}
-                            </p>
+                            <p>{getStatusDescription(status)}</p>
                           </div>
                         </div>
 
-                        {/* DETAILS */}
+                        {/* =================================================
+                            DETAILS
+                        ================================================= */}
 
                         <div className="application-details">
                           <div>
                             <span>APPLICATION ID</span>
 
-                            <strong>#{application.id}</strong>
+                            <strong>#{application.id || "N/A"}</strong>
                           </div>
 
                           <div>
@@ -435,6 +553,23 @@ function Applications() {
               )}
             </>
           )}
+
+          {/* =================================================
+              SECURITY
+          ================================================= */}
+
+          <div className="applications-security-note">
+            <span aria-hidden="true">🔒</span>
+
+            <div>
+              <strong>Your application information is secure</strong>
+
+              <p>
+                CardWise uses secure authentication to protect your account and
+                application information.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
     </div>

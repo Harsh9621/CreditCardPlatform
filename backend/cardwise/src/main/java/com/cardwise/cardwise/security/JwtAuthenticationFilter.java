@@ -1,8 +1,12 @@
 package com.cardwise.cardwise.security;
 
 import com.cardwise.cardwise.entity.User;
+import com.cardwise.cardwise.entity.enums.UserRole;
 import com.cardwise.cardwise.service.JwtService;
 import com.cardwise.cardwise.service.UserService;
+
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -27,8 +31,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     public JwtAuthenticationFilter(
             JwtService jwtService,
-            UserService userService) {
-
+            UserService userService
+    ) {
         this.jwtService = jwtService;
         this.userService = userService;
     }
@@ -37,181 +41,331 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(
             HttpServletRequest request,
             HttpServletResponse response,
-            FilterChain filterChain)
-            throws ServletException, IOException {
+            FilterChain filterChain
+    ) throws ServletException, IOException {
+
+        String requestUri = request.getRequestURI();
+
+        // =========================================================
+        // OPTIONS
+        // =========================================================
+
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // =========================================================
+        // ALREADY AUTHENTICATED
+        // =========================================================
+
+        if (SecurityContextHolder.getContext().getAuthentication() != null) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // =========================================================
+        // AUTHORIZATION HEADER
+        // =========================================================
 
         String authHeader =
                 request.getHeader("Authorization");
 
-        // =====================================================
-        // NO JWT
-        // =====================================================
-
-        if (authHeader == null ||
-                !authHeader.startsWith("Bearer ")) {
+        if (authHeader == null || authHeader.isBlank()) {
 
             filterChain.doFilter(request, response);
+            return;
+        }
+
+        if (!authHeader.regionMatches(
+                true,
+                0,
+                "Bearer ",
+                0,
+                7
+        )) {
+
+            sendUnauthorized(
+                    response,
+                    "Invalid Authorization header."
+            );
+
             return;
         }
 
         String token =
                 authHeader.substring(7).trim();
 
-        // =====================================================
-        // EMPTY TOKEN
-        // =====================================================
+        if (token.isBlank()) {
 
-        if (token.isEmpty()) {
+            sendUnauthorized(
+                    response,
+                    "Authentication token is missing."
+            );
 
-            filterChain.doFilter(request, response);
             return;
         }
 
+        // =========================================================
+        // JWT VALIDATION
+        // =========================================================
+
         try {
 
-            // =================================================
-            // EXTRACT EMAIL
-            // =================================================
+            // -----------------------------------------------------
+            // TOKEN TYPE
+            // -----------------------------------------------------
+
+            String tokenType =
+                    jwtService.extractTokenType(token);
+
+            if (!"ACCESS".equalsIgnoreCase(tokenType)) {
+
+                sendUnauthorized(
+                        response,
+                        "Invalid access token."
+                );
+
+                return;
+            }
+
+            // -----------------------------------------------------
+            // EMAIL
+            // -----------------------------------------------------
 
             String email =
                     jwtService.extractEmail(token);
 
-            if (email == null ||
-                    email.isBlank()) {
+            if (email == null || email.isBlank()) {
 
-                filterChain.doFilter(request, response);
+                sendUnauthorized(
+                        response,
+                        "Authentication token does not contain a valid email."
+                );
+
                 return;
             }
 
-            // =================================================
-            // DON'T AUTHENTICATE TWICE
-            // =================================================
+            email = email.trim();
 
-            if (SecurityContextHolder
-                    .getContext()
-                    .getAuthentication() == null) {
+            // -----------------------------------------------------
+            // USER
+            // -----------------------------------------------------
 
-                // =============================================
-                // FIND USER
-                // =============================================
+            User user =
+                    userService.findByEmail(email);
 
-                User user =
-                        userService.findByEmail(email);
+            if (user == null) {
 
-                // =============================================
-                // CHECK ACTIVE ACCOUNT
-                // =============================================
-
-                if (!user.isActive()) {
-
-                    response.setStatus(
-                            HttpServletResponse.SC_FORBIDDEN
-                    );
-
-                    response.setContentType(
-                            "application/json"
-                    );
-
-                    response.getWriter().write(
-                            "{\"message\":\"Your account is inactive.\"}"
-                    );
-
-                    return;
-                }
-
-                // =============================================
-                // GET ROLE
-                // =============================================
-
-                String role = user.getRole();
-
-                if (role == null ||
-                        role.isBlank()) {
-
-                    response.setStatus(
-                            HttpServletResponse.SC_FORBIDDEN
-                    );
-
-                    response.setContentType(
-                            "application/json"
-                    );
-
-                    response.getWriter().write(
-                            "{\"message\":\"User role is not configured.\"}"
-                    );
-
-                    return;
-                }
-
-                role =
-                        role.trim()
-                            .toUpperCase();
-
-                // =============================================
-                // CREATE AUTHORITY
-                // =============================================
-
-                List<SimpleGrantedAuthority> authorities =
-                        List.of(
-                                new SimpleGrantedAuthority(
-                                        "ROLE_" + role
-                                )
-                        );
-
-                // =============================================
-                // CREATE AUTHENTICATION
-                // =============================================
-
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
-                                user.getEmail(),
-                                null,
-                                authorities
-                        );
-
-                // =============================================
-                // SET SECURITY CONTEXT
-                // =============================================
-
-                SecurityContextHolder
-                        .getContext()
-                        .setAuthentication(
-                                authentication
-                        );
-
-                System.out.println(
-                        "JWT authenticated: "
-                                + user.getEmail()
-                                + " | ROLE_"
-                                + role
+                sendUnauthorized(
+                        response,
+                        "User account not found."
                 );
+
+                return;
             }
 
-        } catch (Exception e) {
+            // -----------------------------------------------------
+            // ACTIVE ACCOUNT
+            // -----------------------------------------------------
+
+            if (!user.isActive()) {
+
+                sendForbidden(
+                        response,
+                        "Your account is inactive."
+                );
+
+                return;
+            }
+
+            // -----------------------------------------------------
+            // ROLE
+            // -----------------------------------------------------
+
+            UserRole role =
+                    user.getRole();
+
+            if (role == null) {
+
+                sendForbidden(
+                        response,
+                        "User role is not configured."
+                );
+
+                return;
+            }
+
+            // -----------------------------------------------------
+            // AUTHORITY
+            // -----------------------------------------------------
+
+            String authority =
+                    "ROLE_" + role.name().toUpperCase();
+
+            List<SimpleGrantedAuthority> authorities =
+                    List.of(
+                            new SimpleGrantedAuthority(authority)
+                    );
+
+            // -----------------------------------------------------
+            // SPRING AUTHENTICATION
+            // -----------------------------------------------------
+
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(
+                            user.getEmail(),
+                            null,
+                            authorities
+                    );
+
+            authentication.setDetails(user);
+
+            SecurityContextHolder
+                    .getContext()
+                    .setAuthentication(authentication);
+
+            // -----------------------------------------------------
+            // DEBUG
+            // -----------------------------------------------------
 
             System.out.println(
-                    "JWT authentication failed: "
-                            + e.getMessage()
+                    "CardWise JWT authenticated: "
+                            + user.getEmail()
+                            + " | role="
+                            + role.name()
+                            + " | authority="
+                            + authority
+                            + " | endpoint="
+                            + requestUri
             );
 
-            response.setStatus(
-                    HttpServletResponse.SC_UNAUTHORIZED
+        } catch (ExpiredJwtException exception) {
+
+            System.err.println(
+                    "CardWise JWT expired for endpoint: "
+                            + requestUri
             );
 
-            response.setContentType(
-                    "application/json"
+            sendUnauthorized(
+                    response,
+                    "Authentication token has expired."
             );
 
-            response.getWriter().write(
-                    "{\"message\":\"Invalid or expired token\"}"
+            return;
+
+        } catch (JwtException exception) {
+
+            System.err.println(
+                    "CardWise JWT validation failed: "
+                            + exception.getMessage()
+            );
+
+            sendUnauthorized(
+                    response,
+                    "Invalid authentication token."
+            );
+
+            return;
+
+        } catch (Exception exception) {
+
+            System.err.println(
+                    "CardWise JWT authentication failed: "
+                            + exception.getMessage()
+            );
+
+            exception.printStackTrace();
+
+            sendUnauthorized(
+                    response,
+                    "Authentication failed."
             );
 
             return;
         }
 
-        filterChain.doFilter(
-                request,
-                response
+        // =========================================================
+        // CONTINUE
+        // =========================================================
+
+        filterChain.doFilter(request, response);
+    }
+
+    // =============================================================
+    // 401
+    // =============================================================
+
+    private void sendUnauthorized(
+            HttpServletResponse response,
+            String message
+    ) throws IOException {
+
+        if (response.isCommitted()) {
+            return;
+        }
+
+        response.setStatus(
+                HttpServletResponse.SC_UNAUTHORIZED
         );
+
+        response.setContentType(
+                "application/json"
+        );
+
+        response.setCharacterEncoding("UTF-8");
+
+        response.getWriter().write(
+                "{\"message\":\""
+                        + escapeJson(message)
+                        + "\"}"
+        );
+    }
+
+    // =============================================================
+    // 403
+    // =============================================================
+
+    private void sendForbidden(
+            HttpServletResponse response,
+            String message
+    ) throws IOException {
+
+        if (response.isCommitted()) {
+            return;
+        }
+
+        response.setStatus(
+                HttpServletResponse.SC_FORBIDDEN
+        );
+
+        response.setContentType(
+                "application/json"
+        );
+
+        response.setCharacterEncoding("UTF-8");
+
+        response.getWriter().write(
+                "{\"message\":\""
+                        + escapeJson(message)
+                        + "\"}"
+        );
+    }
+
+    // =============================================================
+    // JSON ESCAPE
+    // =============================================================
+
+    private String escapeJson(String value) {
+
+        if (value == null) {
+            return "";
+        }
+
+        return value
+                .replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r");
     }
 }

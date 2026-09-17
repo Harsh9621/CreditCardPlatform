@@ -1,91 +1,130 @@
 import axios from "axios";
 
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
+
 const api = axios.create({
-  baseURL: `${import.meta.env.VITE_API_URL}/api`,
+  baseURL: API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
   },
+  timeout: 20000,
 });
-
-// =====================================================
-// REQUEST INTERCEPTOR
-// Automatically attach JWT token
-// =====================================================
 
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
 
-    if (token) {
-      config.headers = config.headers || {};
-      config.headers.Authorization = `Bearer ${token}`;
+    config.headers = config.headers || {};
+
+    config.headers.Accept = "application/json";
+
+    if (token && token.trim()) {
+      config.headers.Authorization = `Bearer ${token.trim()}`;
+    } else {
+      delete config.headers.Authorization;
     }
 
     return config;
   },
-
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error),
 );
 
-// =====================================================
-// RESPONSE INTERCEPTOR
-// =====================================================
-
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
 
   (error) => {
-    const status = error.response?.status;
+    const status = error?.response?.status;
+    const requestUrl = error?.config?.url || "";
 
-    // =================================================
-    // 401 = NOT AUTHENTICATED
-    // =================================================
+    const isAuthRequest =
+      requestUrl.includes("/auth/login") ||
+      requestUrl.includes("/auth/register") ||
+      requestUrl.includes("/auth/forgot-password") ||
+      requestUrl.includes("/auth/reset-password");
+
+    // ==========================================================
+    // LOG ACTUAL SERVER RESPONSE
+    // ==========================================================
 
     if (status === 401) {
-      console.warn("Authentication failed.");
+      console.warn(
+        "CardWise API 401:",
+        error?.response?.data || "Authentication required.",
+      );
+    }
+
+    if (status === 403) {
+      console.warn(
+        "CardWise API 403:",
+        error?.response?.data || "Access denied.",
+      );
+    }
+
+    // ==========================================================
+    // ONLY CLEAR SESSION FOR REAL AUTHENTICATION FAILURE
+    // ==========================================================
+
+    if (
+      status === 401 &&
+      !isAuthRequest &&
+      !window.__cardwiseAuthHandling
+    ) {
+      window.__cardwiseAuthHandling = true;
+
+      console.warn(
+        "CardWise authentication failed. Clearing local session.",
+      );
+
+      const currentPath =
+        window.location.pathname +
+        window.location.search +
+        window.location.hash;
+
+      const isPublicPage =
+        currentPath === "/" ||
+        currentPath === "/login" ||
+        currentPath === "/register" ||
+        currentPath === "/forgot-password";
+
+      if (!isPublicPage) {
+        sessionStorage.setItem(
+          "cardwise_return_to",
+          currentPath,
+        );
+      }
 
       localStorage.removeItem("token");
       localStorage.removeItem("user");
 
-      if (window.location.pathname !== "/login") {
-        window.location.href = "/login";
-      }
-    }
-
-    // =================================================
-    // 403 = FORBIDDEN
-    // =================================================
-
-    if (status === 403) {
-      console.warn(
-        "Access denied. Administrator privileges required."
+      window.dispatchEvent(
+        new Event("cardwise-auth-expired"),
       );
 
-      // IMPORTANT:
-      // Do NOT remove the token.
-      //
-      // A valid USER token can receive 403 when trying
-      // to access an ADMIN endpoint.
+      setTimeout(() => {
+        window.__cardwiseAuthHandling = false;
+      }, 1000);
     }
-
-    // =================================================
-    // 409 = BUSINESS CONFLICT
-    // =================================================
 
     if (status === 409) {
       console.warn(
-        "Application conflict:",
-        error.response?.data?.message
+        "CardWise request conflict:",
+        error?.response?.data?.message ||
+          error?.response?.data?.error ||
+          "The request conflicts with existing data.",
+      );
+    }
+
+    if (status >= 500) {
+      console.error(
+        "CardWise server error:",
+        error?.response?.data || error?.message,
       );
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default api;

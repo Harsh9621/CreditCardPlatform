@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+
 import api from "../services/api";
 import "./Cards.css";
 
 function Cards() {
   const navigate = useNavigate();
-
   const notificationTimer = useRef(null);
 
   const [cards, setCards] = useState([]);
@@ -13,19 +13,11 @@ function Cards() {
   const [error, setError] = useState("");
 
   const [applyingId, setApplyingId] = useState(null);
-
-  /*
-   * Stores latest application status for each card.
-   *
-   * Example:
-   * {
-   *   2: "REJECTED",
-   *   3: "PENDING",
-   *   4: "PENDING",
-   *   6: "APPROVED"
-   * }
-   */
   const [applicationStatusByCard, setApplicationStatusByCard] = useState({});
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterType, setFilterType] = useState("ALL");
+  const [sortBy, setSortBy] = useState("FEATURED");
 
   const [notification, setNotification] = useState({
     show: false,
@@ -34,11 +26,13 @@ function Cards() {
     message: "",
   });
 
-  /* =====================================================
-     CLEANUP
-     ===================================================== */
+  /* =========================================================
+     LOAD PAGE
+     ========================================================= */
 
   useEffect(() => {
+    loadPageData();
+
     return () => {
       if (notificationTimer.current) {
         clearTimeout(notificationTimer.current);
@@ -46,34 +40,24 @@ function Cards() {
     };
   }, []);
 
-  /* =====================================================
-     INITIAL LOAD
-     ===================================================== */
-
-  useEffect(() => {
-    loadPageData();
-  }, []);
-
-  /* =====================================================
-     LOAD CARDS + USER APPLICATIONS
-     ===================================================== */
-
   const loadPageData = async () => {
-    await Promise.all([fetchCards(), fetchUserApplications()]);
+    setLoading(true);
+    setError("");
+
+    try {
+      await Promise.all([fetchCards(), fetchUserApplications()]);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  /* =====================================================
-     FETCH CARDS
-     ===================================================== */
+  /* =========================================================
+     CARD DATA
+     ========================================================= */
 
   const fetchCards = async () => {
     try {
-      setLoading(true);
-      setError("");
-
       const response = await api.get("/cards");
-
-      console.log("Cards API response:", response.data);
 
       const data = Array.isArray(response.data)
         ? response.data
@@ -89,14 +73,12 @@ function Cards() {
         err.response?.data?.message ||
           "Unable to load credit cards. Please make sure the backend is running.",
       );
-    } finally {
-      setLoading(false);
     }
   };
 
-  /* =====================================================
-     GET LOGGED-IN USER
-     ===================================================== */
+  /* =========================================================
+     AUTH HELPERS
+     ========================================================= */
 
   const getLoggedInUser = () => {
     const token = localStorage.getItem("token");
@@ -108,8 +90,8 @@ function Cards() {
 
     try {
       return JSON.parse(savedUser);
-    } catch (error) {
-      console.error("Unable to parse user:", error);
+    } catch (err) {
+      console.error("Unable to parse saved user:", err);
 
       localStorage.removeItem("token");
       localStorage.removeItem("user");
@@ -118,9 +100,9 @@ function Cards() {
     }
   };
 
-  /* =====================================================
-     FETCH USER APPLICATIONS
-     ===================================================== */
+  /* =========================================================
+     APPLICATION DATA
+     ========================================================= */
 
   const fetchUserApplications = async () => {
     const token = localStorage.getItem("token");
@@ -138,14 +120,6 @@ function Cards() {
     }
 
     try {
-      /*
-       * This endpoint should return applications
-       * belonging to the logged-in user.
-       *
-       * Your current backend response shows:
-       * Array(27)
-       */
-
       const response = await api.get(`/applications/user/${user.id}`);
 
       const applications = Array.isArray(response.data)
@@ -154,52 +128,50 @@ function Cards() {
           ? [response.data]
           : [];
 
-      console.log("User applications:", applications);
-
-      /*
-       * Build:
-       *
-       * card ID -> latest application status
-       */
-
       const statusMap = {};
 
       applications.forEach((application) => {
         const creditCardId = application?.creditCard?.id;
         const status = application?.status;
 
-        if (creditCardId && status) {
-          /*
-           * Because the backend is returning applications
-           * in newest-first order, the first application
-           * for a card is the latest one.
-           */
-          if (!statusMap[creditCardId]) {
-            statusMap[creditCardId] = status.toUpperCase();
-          }
+        if (!creditCardId || !status) {
+          return;
+        }
+
+        const normalizedStatus = String(status).toUpperCase();
+
+        const applicationId = Number(application?.id || 0);
+
+        const existing = statusMap[creditCardId];
+
+        if (!existing || applicationId > existing.id) {
+          statusMap[creditCardId] = {
+            id: applicationId,
+            status: normalizedStatus,
+          };
         }
       });
 
-      console.log("Active application status by card:", statusMap);
+      const finalStatusMap = {};
 
-      setApplicationStatusByCard(statusMap);
+      Object.entries(statusMap).forEach(([cardId, value]) => {
+        finalStatusMap[cardId] = value.status;
+      });
+
+      setApplicationStatusByCard(finalStatusMap);
     } catch (err) {
       console.error(
         "User applications API error:",
         err.response?.data || err.message,
       );
 
-      /*
-       * Do not break the cards page if application history
-       * cannot be loaded.
-       */
       setApplicationStatusByCard({});
     }
   };
 
-  /* =====================================================
-     SHOW NOTIFICATION
-     ===================================================== */
+  /* =========================================================
+     NOTIFICATIONS
+     ========================================================= */
 
   const showNotification = (type, title, message) => {
     if (notificationTimer.current) {
@@ -221,10 +193,6 @@ function Cards() {
     }, 5000);
   };
 
-  /* =====================================================
-     CLOSE NOTIFICATION
-     ===================================================== */
-
   const closeNotification = () => {
     if (notificationTimer.current) {
       clearTimeout(notificationTimer.current);
@@ -236,9 +204,9 @@ function Cards() {
     }));
   };
 
-  /* =====================================================
+  /* =========================================================
      APPLY FOR CARD
-     ===================================================== */
+     ========================================================= */
 
   const applyForCard = async (cardId) => {
     if (applyingId !== null) {
@@ -246,10 +214,6 @@ function Cards() {
     }
 
     const token = localStorage.getItem("token");
-
-    /* -----------------------------------------------------
-       LOGIN CHECK
-       ----------------------------------------------------- */
 
     if (!token) {
       showNotification(
@@ -264,10 +228,6 @@ function Cards() {
 
       return;
     }
-
-    /* -----------------------------------------------------
-       USER CHECK
-       ----------------------------------------------------- */
 
     const user = getLoggedInUser();
 
@@ -295,17 +255,7 @@ function Cards() {
       return;
     }
 
-    /* -----------------------------------------------------
-       CURRENT APPLICATION STATUS
-       ----------------------------------------------------- */
-
     const currentStatus = applicationStatusByCard[cardId]?.toUpperCase();
-
-    /*
-     * APPROVED
-     *
-     * User cannot apply again.
-     */
 
     if (currentStatus === "APPROVED") {
       showNotification(
@@ -317,13 +267,6 @@ function Cards() {
       return;
     }
 
-    /*
-     * PENDING
-     *
-     * User cannot submit another application while
-     * the current one is being processed.
-     */
-
     if (currentStatus === "PENDING") {
       showNotification(
         "warning",
@@ -334,32 +277,14 @@ function Cards() {
       return;
     }
 
-    /*
-     * REJECTED
-     *
-     * User IS allowed to apply again.
-     */
-
     try {
       setApplyingId(cardId);
-
-      console.log("Submitting application:", {
-        userId: user.id,
-        creditCardId: cardId,
-        previousStatus: currentStatus || "NONE",
-      });
 
       const response = await api.post(
         `/applications/apply?userId=${user.id}&creditCardId=${cardId}`,
       );
 
-      console.log("Application response:", response.data);
-
       const applicationId = response.data?.id;
-
-      /*
-       * New application is pending.
-       */
 
       setApplicationStatusByCard((previous) => ({
         ...previous,
@@ -375,25 +300,12 @@ function Cards() {
       );
     } catch (err) {
       console.error("Application error:", err);
-      console.error("Status:", err.response?.status);
-      console.error("Response:", err.response?.data);
 
       const backendMessage =
         err.response?.data?.message ||
         (typeof err.response?.data === "string" ? err.response.data : "");
 
-      /* ---------------------------------------------------
-         DUPLICATE APPLICATION
-         --------------------------------------------------- */
-
       if (err.response?.status === 409) {
-        /*
-         * Do NOT assume it is approved.
-         *
-         * Refresh applications so the actual latest
-         * status is displayed.
-         */
-
         await fetchUserApplications();
 
         showNotification(
@@ -405,10 +317,6 @@ function Cards() {
 
         return;
       }
-
-      /* ---------------------------------------------------
-         UNAUTHORIZED
-         --------------------------------------------------- */
 
       if (err.response?.status === 401) {
         localStorage.removeItem("token");
@@ -429,10 +337,6 @@ function Cards() {
         return;
       }
 
-      /* ---------------------------------------------------
-         FORBIDDEN
-         --------------------------------------------------- */
-
       if (err.response?.status === 403) {
         showNotification(
           "error",
@@ -442,10 +346,6 @@ function Cards() {
 
         return;
       }
-
-      /* ---------------------------------------------------
-         GENERAL ERROR
-         --------------------------------------------------- */
 
       showNotification(
         "error",
@@ -458,9 +358,9 @@ function Cards() {
     }
   };
 
-  /* =====================================================
-     BUTTON TEXT
-     ===================================================== */
+  /* =========================================================
+     APPLICATION UI HELPERS
+     ========================================================= */
 
   const getApplicationButtonText = (cardId) => {
     const status = applicationStatusByCard[cardId]?.toUpperCase();
@@ -469,43 +369,28 @@ function Cards() {
       return "Applying...";
     }
 
-    switch (status) {
-      case "PENDING":
-        return "Application Pending";
-
-      case "APPROVED":
-        return "✓ Application Approved";
-
-      case "REJECTED":
-        return "Apply Again →";
-
-      default:
-        return "Apply Now →";
+    if (status === "PENDING") {
+      return "Application Pending";
     }
-  };
 
-  /* =====================================================
-     BUTTON DISABLED
-     ===================================================== */
+    if (status === "APPROVED") {
+      return "✓ Application Approved";
+    }
+
+    if (status === "REJECTED") {
+      return "Apply Again →";
+    }
+
+    return "Apply Now →";
+  };
 
   const isApplicationButtonDisabled = (cardId) => {
     const status = applicationStatusByCard[cardId]?.toUpperCase();
-
-    /*
-     * Only PENDING and APPROVED are disabled.
-     *
-     * REJECTED remains enabled.
-     * NONE remains enabled.
-     */
 
     return (
       applyingId === cardId || status === "PENDING" || status === "APPROVED"
     );
   };
-
-  /* =====================================================
-     STATUS CLASS
-     ===================================================== */
 
   const getApplicationStatusClass = (cardId) => {
     const status = applicationStatusByCard[cardId]?.toUpperCase();
@@ -525,44 +410,137 @@ function Cards() {
     return "";
   };
 
-  /* =====================================================
-     CURRENCY
-     ===================================================== */
+  const getApplicationStatusLabel = (cardId) => {
+    const status = applicationStatusByCard[cardId]?.toUpperCase();
+
+    if (status === "PENDING") {
+      return "Application under review";
+    }
+
+    if (status === "APPROVED") {
+      return "Application approved";
+    }
+
+    if (status === "REJECTED") {
+      return "Previous application rejected";
+    }
+
+    return "";
+  };
+
+  /* =========================================================
+     FORMATTING
+     ========================================================= */
 
   const formatCurrency = (value) => {
     return `₹${Number(value || 0).toLocaleString("en-IN")}`;
   };
 
-  /* =====================================================
-     LOADING
-     ===================================================== */
+  /* =========================================================
+     FILTERS + SORTING
+     ========================================================= */
+
+  const cardTypes = useMemo(() => {
+    const types = cards
+      .map((card) => card.cardType)
+      .filter(Boolean)
+      .map((type) => String(type).trim());
+
+    return ["ALL", ...new Set(types)];
+  }, [cards]);
+
+  const filteredCards = useMemo(() => {
+    const query = searchTerm.trim().toLowerCase();
+
+    const result = cards.filter((card) => {
+      const matchesSearch =
+        !query ||
+        String(card.name || "")
+          .toLowerCase()
+          .includes(query) ||
+        String(card.bank || "")
+          .toLowerCase()
+          .includes(query) ||
+        String(card.cardType || "")
+          .toLowerCase()
+          .includes(query) ||
+        String(card.rewardType || "")
+          .toLowerCase()
+          .includes(query) ||
+        String(card.benefits || "")
+          .toLowerCase()
+          .includes(query);
+
+      const matchesType =
+        filterType === "ALL" ||
+        String(card.cardType || "").toLowerCase() === filterType.toLowerCase();
+
+      return matchesSearch && matchesType;
+    });
+
+    return [...result].sort((a, b) => {
+      if (sortBy === "CASHBACK") {
+        return (
+          Number(b.cashbackPercentage || 0) - Number(a.cashbackPercentage || 0)
+        );
+      }
+
+      if (sortBy === "LOW_FEE") {
+        return Number(a.annualFee || 0) - Number(b.annualFee || 0);
+      }
+
+      if (sortBy === "NAME") {
+        return String(a.name || "").localeCompare(String(b.name || ""));
+      }
+
+      return Number(a.id || 0) - Number(b.id || 0);
+    });
+  }, [cards, searchTerm, filterType, sortBy]);
+
+  const clearFilters = () => {
+    setSearchTerm("");
+    setFilterType("ALL");
+    setSortBy("FEATURED");
+  };
+
+  /* =========================================================
+     LOADING STATE
+     ========================================================= */
 
   if (loading) {
     return (
-      <div className="cards-page">
-        <section className="cards-section">
+      <main className="cards-page">
+        <section className="cards-loading-section">
           <div className="cards-message">
-            <div className="loader"></div>
+            <div className="premium-loader" aria-hidden="true">
+              <span />
+            </div>
 
-            <h3>Loading Credit Cards...</h3>
+            <span className="message-eyebrow">CARDWISE</span>
 
-            <p>Fetching the latest cards from CardWise.</p>
+            <h3>Loading your card collection</h3>
+
+            <p>Fetching the latest credit cards and application status.</p>
           </div>
         </section>
-      </div>
+      </main>
     );
   }
 
-  /* =====================================================
-     ERROR
-     ===================================================== */
+  /* =========================================================
+     ERROR STATE
+     ========================================================= */
 
   if (error) {
     return (
-      <div className="cards-page">
-        <section className="cards-section">
+      <main className="cards-page">
+        <section className="cards-loading-section">
           <div className="cards-message">
-            <div className="message-icon">!</div>
+            <div className="message-icon error-icon" aria-hidden="true">
+              !
+            </div>
+
+            <span className="message-eyebrow">TEMPORARY ISSUE</span>
 
             <h3>Unable to Load Cards</h3>
 
@@ -577,19 +555,19 @@ function Cards() {
             </button>
           </div>
         </section>
-      </div>
+      </main>
     );
   }
 
-  /* =====================================================
+  /* =========================================================
      PAGE
-     ===================================================== */
+     ========================================================= */
 
   return (
-    <div className="cards-page">
-      {/* =================================================
-          APPLICATION POPUP
-      ================================================= */}
+    <main className="cards-page">
+      {/* =====================================================
+          TOAST
+          ===================================================== */}
 
       {notification.show && (
         <div
@@ -597,7 +575,7 @@ function Cards() {
           role="alert"
           aria-live="polite"
         >
-          <div className="toast-icon">
+          <div className="toast-icon" aria-hidden="true">
             {notification.type === "success" && "✓"}
 
             {notification.type === "warning" && "!"}
@@ -622,73 +600,263 @@ function Cards() {
         </div>
       )}
 
-      {/* =================================================
+      {/* =====================================================
           HERO
-      ================================================= */}
+          ===================================================== */}
 
       <section className="cards-hero">
-        <div className="cards-hero-content">
-          <span className="section-badge">CARDWISE CREDIT CARDS</span>
+        <div className="hero-orb hero-orb-one" aria-hidden="true" />
 
-          <h1>Find the Right Credit Card for You</h1>
+        <div className="hero-orb hero-orb-two" aria-hidden="true" />
 
-          <p>
-            Compare fees, cashback, rewards and benefits to find a credit card
-            that fits your lifestyle.
-          </p>
+        <div className="hero-grid" aria-hidden="true" />
 
-          <div className="hero-stats">
-            <div>
-              <strong>{cards.length}+</strong>
-
-              <span>Available Cards</span>
+        <div className="cards-hero-inner">
+          <div className="hero-copy">
+            <div className="hero-eyebrow">
+              <span className="eyebrow-dot" aria-hidden="true" />
+              CARDWISE CREDIT MARKETPLACE
             </div>
 
-            <div>
-              <strong>10+</strong>
+            <h1>
+              Choose a card that
+              <span> works for you.</span>
+            </h1>
 
-              <span>Major Banks</span>
+            <p>
+              Compare annual fees, cashback, rewards and benefits across the
+              CardWise collection before you apply.
+            </p>
+
+            <div className="hero-actions">
+              <a href="#available-cards" className="hero-primary">
+                Explore Cards
+                <span aria-hidden="true">↓</span>
+              </a>
+
+              <Link to="/compare" className="hero-secondary">
+                Compare Cards
+                <span aria-hidden="true">→</span>
+              </Link>
             </div>
 
-            <div>
-              <strong>100%</strong>
+            <div className="hero-trust-row">
+              <div className="trust-item">
+                <span className="trust-icon" aria-hidden="true">
+                  ✓
+                </span>
 
-              <span>Secure</span>
+                <span>Transparent fees</span>
+              </div>
+
+              <div className="trust-item">
+                <span className="trust-icon" aria-hidden="true">
+                  ✓
+                </span>
+
+                <span>Secure applications</span>
+              </div>
+
+              <div className="trust-item">
+                <span className="trust-icon" aria-hidden="true">
+                  ✓
+                </span>
+
+                <span>Easy comparison</span>
+              </div>
             </div>
+          </div>
+
+          {/* =================================================
+              HERO CARD SHOWCASE
+              ================================================= */}
+
+          <div className="hero-showcase">
+            <div className="showcase-glow" aria-hidden="true" />
+
+            <div className="showcase-card">
+              <div className="showcase-card-top">
+                <div className="showcase-logo">C</div>
+
+                <span>CardWise</span>
+              </div>
+
+              <div className="showcase-chip" aria-hidden="true">
+                <i />
+                <i />
+                <i />
+              </div>
+
+              <div className="showcase-number">
+                4532&nbsp;&nbsp;••••&nbsp;&nbsp;••••&nbsp;&nbsp;7821
+              </div>
+
+              <div className="showcase-bottom">
+                <div>
+                  <small>CARD HOLDER</small>
+
+                  <strong>CARDWISE MEMBER</strong>
+                </div>
+
+                <div>
+                  <small>VALID THRU</small>
+
+                  <strong>12/29</strong>
+                </div>
+              </div>
+            </div>
+
+            <div className="showcase-floating showcase-cashback">
+              <span>Top cashback</span>
+
+              <strong>5.5%</strong>
+            </div>
+
+            <div className="showcase-floating showcase-secure">
+              <span className="secure-check" aria-hidden="true">
+                ✓
+              </span>
+
+              <div>
+                <strong>Secure</strong>
+
+                <small>Protected account</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ===================================================
+            HERO METRICS
+            =================================================== */}
+
+        <div className="hero-metrics">
+          <div>
+            <strong>{cards.length}+</strong>
+
+            <span>Available Cards</span>
+          </div>
+
+          <div>
+            <strong>10+</strong>
+
+            <span>Major Banks</span>
+          </div>
+
+          <div>
+            <strong>100%</strong>
+
+            <span>Secure Platform</span>
+          </div>
+
+          <div>
+            <strong>24/7</strong>
+
+            <span>Online Access</span>
           </div>
         </div>
       </section>
 
-      {/* =================================================
-          CARDS
-      ================================================= */}
+      {/* =====================================================
+          CARD COLLECTION
+          ===================================================== */}
 
-      <section className="cards-section">
+      <section className="cards-section" id="available-cards">
         <div className="cards-container">
-          <div className="cards-heading">
+          <div className="section-intro">
             <div>
-              <span className="small-title">AVAILABLE CARDS</span>
+              <span className="section-eyebrow">FIND YOUR MATCH</span>
 
               <h2>Explore Credit Cards</h2>
 
               <p>
-                View card fees, rewards, eligibility and benefits before
-                applying.
+                Compare the details that matter before choosing your next card.
               </p>
             </div>
 
-            <span className="card-count">
-              {cards.length} {cards.length === 1 ? "Card" : "Cards"}
-            </span>
+            <div className="result-pill">
+              <span>{filteredCards.length}</span>
+
+              {filteredCards.length === 1 ? " card" : " cards"}
+            </div>
           </div>
 
           {/* =================================================
-              EMPTY
-          ================================================= */}
+              TOOLBAR
+              ================================================= */}
+
+          <div className="card-toolbar">
+            <div className="search-box">
+              <span className="search-icon" aria-hidden="true">
+                ⌕
+              </span>
+
+              <input
+                type="search"
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+                placeholder="Search cards, banks or rewards..."
+                aria-label="Search credit cards"
+              />
+
+              {searchTerm && (
+                <button
+                  type="button"
+                  className="clear-search"
+                  onClick={() => setSearchTerm("")}
+                  aria-label="Clear search"
+                >
+                  ×
+                </button>
+              )}
+            </div>
+
+            <div className="toolbar-controls">
+              <label>
+                <span>Card Type</span>
+
+                <select
+                  value={filterType}
+                  onChange={(event) => setFilterType(event.target.value)}
+                >
+                  {cardTypes.map((type) => (
+                    <option key={type} value={type}>
+                      {type === "ALL" ? "All Cards" : type}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label>
+                <span>Sort By</span>
+
+                <select
+                  value={sortBy}
+                  onChange={(event) => setSortBy(event.target.value)}
+                >
+                  <option value="FEATURED">Featured</option>
+
+                  <option value="CASHBACK">Highest Cashback</option>
+
+                  <option value="LOW_FEE">Lowest Annual Fee</option>
+
+                  <option value="NAME">Name A–Z</option>
+                </select>
+              </label>
+            </div>
+          </div>
+
+          {/* =================================================
+              EMPTY STATES
+              ================================================= */}
 
           {cards.length === 0 ? (
             <div className="cards-message">
-              <div className="message-icon">💳</div>
+              <div className="message-icon" aria-hidden="true">
+                ▣
+              </div>
+
+              <span className="message-eyebrow">CARDWISE COLLECTION</span>
 
               <h3>No Credit Cards Available</h3>
 
@@ -697,43 +865,74 @@ function Cards() {
                 database.
               </p>
             </div>
+          ) : filteredCards.length === 0 ? (
+            <div className="cards-message">
+              <div className="message-icon" aria-hidden="true">
+                ⌕
+              </div>
+
+              <span className="message-eyebrow">NO MATCHES</span>
+
+              <h3>No cards match your search</h3>
+
+              <p>Try another bank, card name, reward or card type.</p>
+
+              <button
+                type="button"
+                className="primary-button"
+                onClick={clearFilters}
+              >
+                Clear Filters
+              </button>
+            </div>
           ) : (
             /* =================================================
-               CARD GRID
-            ================================================= */
+               CREDIT CARD GRID
+               ================================================= */
 
             <div className="credit-cards-grid">
-              {cards.map((card) => {
+              {filteredCards.map((card, index) => {
                 const status = applicationStatusByCard[card.id]?.toUpperCase();
 
-                const isApplying = applyingId === card.id;
-
                 return (
-                  <article className="credit-card-item" key={card.id}>
-                    {/* =================================================
-                        CARD VISUAL
-                    ================================================= */}
+                  <article
+                    className={`credit-card-item ${
+                      index === 0 ? "featured-card" : ""
+                    }`}
+                    key={card.id}
+                  >
+                    {/* ======================================
+                          CARD VISUAL
+                          ====================================== */}
 
                     <div className="card-visual">
+                      <div className="card-shine" aria-hidden="true" />
+
+                      {index === 0 && (
+                        <span className="featured-label">FEATURED</span>
+                      )}
+
                       <div className="card-visual-top">
                         <div className="bank-logo">
                           {card.bank?.charAt(0)?.toUpperCase() || "C"}
                         </div>
 
-                        <span className="card-brand">CardWise</span>
+                        <span className="card-brand">CARDWISE</span>
                       </div>
 
-                      <div className="card-chip">
-                        <span></span>
+                      <div className="card-chip" aria-hidden="true">
+                        <span />
                       </div>
 
-                      <div className="card-number">4532 •••• •••• 7821</div>
+                      <div className="card-number">
+                        4532&nbsp;&nbsp;••••&nbsp;&nbsp;••••&nbsp;&nbsp;7821
+                      </div>
 
                       <div className="card-visual-bottom">
                         <div>
                           <small>CARD HOLDER</small>
 
-                          <strong>CARDWISE USER</strong>
+                          <strong>CARDWISE MEMBER</strong>
                         </div>
 
                         <div>
@@ -742,18 +941,22 @@ function Cards() {
                           <strong>12/29</strong>
                         </div>
                       </div>
+
+                      <span className="card-network">VISA</span>
                     </div>
 
-                    {/* =================================================
-                        CARD CONTENT
-                    ================================================= */}
+                    {/* ======================================
+                          CARD CONTENT
+                          ====================================== */}
 
                     <div className="credit-card-content">
                       <div className="card-title-row">
                         <div>
-                          <h3>{card.name}</h3>
+                          <span className="bank-label">
+                            {card.bank || "CardWise Partner"}
+                          </span>
 
-                          <p className="bank-name">{card.bank}</p>
+                          <h3>{card.name}</h3>
                         </div>
 
                         <span className="card-type">
@@ -761,32 +964,34 @@ function Cards() {
                         </span>
                       </div>
 
-                      {/* =================================================
-                          APPLICATION STATUS
-                      ================================================= */}
-
                       {status && (
                         <div
                           className={`application-status ${getApplicationStatusClass(
                             card.id,
                           )}`}
                         >
-                          <span className="application-status-dot"></span>
+                          <span
+                            className="application-status-dot"
+                            aria-hidden="true"
+                          />
 
-                          <span>
-                            {status === "PENDING" && "Application under review"}
-
-                            {status === "APPROVED" && "Application approved"}
-
-                            {status === "REJECTED" &&
-                              "Previous application rejected"}
-                          </span>
+                          <span>{getApplicationStatusLabel(card.id)}</span>
                         </div>
                       )}
 
-                      {/* =================================================
-                          FEES
-                      ================================================= */}
+                      <div className="card-highlight-grid">
+                        <div className="highlight-item cashback-highlight">
+                          <span>Cashback</span>
+
+                          <strong>{card.cashbackPercentage ?? 0}%</strong>
+                        </div>
+
+                        <div className="highlight-item">
+                          <span>Reward Type</span>
+
+                          <strong>{card.rewardType || "Rewards"}</strong>
+                        </div>
+                      </div>
 
                       <div className="card-details">
                         <div className="detail-item">
@@ -801,33 +1006,21 @@ function Cards() {
                           <strong>{formatCurrency(card.joiningFee)}</strong>
                         </div>
 
-                        <div className="detail-item highlight">
-                          <span>Cashback</span>
+                        <div className="detail-item">
+                          <span>Card Type</span>
 
-                          <strong>{card.cashbackPercentage ?? 0}%</strong>
+                          <strong>{card.cardType || "Standard"}</strong>
                         </div>
                       </div>
-
-                      {/* =================================================
-                          REWARD
-                      ================================================= */}
-
-                      <div className="reward-box">
-                        <div className="feature-icon">★</div>
-
-                        <div>
-                          <span>Reward Type</span>
-
-                          <strong>{card.rewardType || "Rewards"}</strong>
-                        </div>
-                      </div>
-
-                      {/* =================================================
-                          ELIGIBILITY
-                      ================================================= */}
 
                       <div className="info-box">
-                        <h4>Who can apply?</h4>
+                        <div className="info-heading">
+                          <span className="info-icon" aria-hidden="true">
+                            ✓
+                          </span>
+
+                          <h4>Eligibility</h4>
+                        </div>
 
                         <p>
                           {card.eligibility ||
@@ -835,12 +1028,14 @@ function Cards() {
                         </p>
                       </div>
 
-                      {/* =================================================
-                          BENEFITS
-                      ================================================= */}
-
                       <div className="info-box">
-                        <h4>Key Benefits</h4>
+                        <div className="info-heading">
+                          <span className="info-icon" aria-hidden="true">
+                            ✦
+                          </span>
+
+                          <h4>Key Benefits</h4>
+                        </div>
 
                         <p>
                           {card.benefits ||
@@ -848,13 +1043,17 @@ function Cards() {
                         </p>
                       </div>
 
-                      {/* =================================================
-                          ACTIONS
-                      ================================================= */}
+                      {/* ====================================
+                            CARD ACTIONS
+                            ==================================== */}
 
                       <div className="card-actions">
-                        <Link to="/contact" className="contact-card-button">
-                          Contact Admin
+                        <Link
+                          to={`/cards/${card.id}`}
+                          className="details-button"
+                        >
+                          View Details
+                          <span aria-hidden="true">→</span>
                         </Link>
 
                         <button
@@ -872,6 +1071,11 @@ function Cards() {
                           {getApplicationButtonText(card.id)}
                         </button>
                       </div>
+
+                      <Link to="/compare" className="compare-card-button">
+                        <span aria-hidden="true">⇄</span>
+                        Compare this card
+                      </Link>
                     </div>
                   </article>
                 );
@@ -881,25 +1085,35 @@ function Cards() {
         </div>
       </section>
 
-      {/* =================================================
-          CONTACT CTA
-      ================================================= */}
+      {/* =====================================================
+          CTA
+          ===================================================== */}
 
       <section className="cards-contact-cta">
-        <div>
-          <span>NEED HELP?</span>
+        <div className="cta-glow" aria-hidden="true" />
 
-          <h2>Have Questions About a Card?</h2>
+        <div className="cta-content">
+          <span className="section-eyebrow">NEED SOME HELP?</span>
+
+          <h2>Not sure which card fits you?</h2>
 
           <p>
-            Contact the CardWise team if you need help understanding
-            eligibility, benefits or the application process.
+            Compare your options side by side or contact the CardWise team for
+            help understanding card benefits, eligibility and applications.
           </p>
 
-          <Link to="/contact">Contact CardWise →</Link>
+          <div className="cta-actions">
+            <Link to="/compare" className="cta-primary">
+              Compare Cards →
+            </Link>
+
+            <Link to="/contact" className="cta-secondary">
+              Contact CardWise
+            </Link>
+          </div>
         </div>
       </section>
-    </div>
+    </main>
   );
 }
 

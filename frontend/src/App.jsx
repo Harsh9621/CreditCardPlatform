@@ -1,20 +1,29 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import React from "react";
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+  useNavigate,
+} from "react-router-dom";
 
-// =====================================================
-// USER PAGES
-// =====================================================
+import { useAuth } from "./context/AuthContext";
+
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Dashboard from "./pages/Dashboard";
+import Profile from "./pages/Profile";
 import Cards from "./pages/Cards";
+import CardDetails from "./pages/CardDetails";
+import CompareCards from "./pages/CompareCards";
+import Apply from "./pages/Apply";
 import Applications from "./pages/Applications";
 import Contact from "./pages/Contact";
-import Profile from "./pages/Profile";
-
-// =====================================================
-// ADMIN PAGES
-// =====================================================
+import ForgotPassword from "./pages/ForgotPassword";
 
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminApplications from "./pages/AdminApplications";
@@ -22,137 +31,33 @@ import AdminCards from "./pages/AdminCards";
 import AdminProfile from "./pages/AdminProfile";
 import AdminContact from "./pages/AdminContact";
 
-// =====================================================
-// COMPONENTS
-// =====================================================
-
-import Navbar from "./components/Navbar";
-
-// =====================================================
-// GLOBAL CSS
-// =====================================================
+import ProtectedRoute from "./routes/ProtectedRoute";
+import PublicRoute from "./routes/PublicRoute";
 
 import "./App.css";
 
-// =====================================================
-// GET CURRENT USER
-// =====================================================
-
-function getCurrentUser() {
-  try {
-    const savedUser = localStorage.getItem("user");
-
-    if (!savedUser) {
-      return null;
-    }
-
-    return JSON.parse(savedUser);
-  } catch (error) {
-    console.error("Error reading user:", error);
-    return null;
-  }
-}
-
-// =====================================================
-// GET USER ROLE
-// =====================================================
-
-function getUserRole() {
-  const user = getCurrentUser();
-
-  if (!user) {
-    return null;
-  }
-
-  return String(user.role || "").toUpperCase();
-}
-
-// =====================================================
-// ADMIN PROTECTED ROUTE
-// =====================================================
-
-function AdminRoute({ children }) {
-  const token = localStorage.getItem("token");
-  const user = getCurrentUser();
-
-  // Not logged in
-  if (!token || !user) {
-    return <Navigate to="/login" replace />;
-  }
-
-  const role = getUserRole();
-
-  // Only ADMIN can access admin pages
-  if (role !== "ADMIN") {
-    return <Navigate to="/" replace />;
-  }
-
-  return children;
-}
-
-// =====================================================
-// USER PROTECTED ROUTE
-// =====================================================
-
-function UserRoute({ children }) {
-  const token = localStorage.getItem("token");
-  const user = getCurrentUser();
-
-  // Not logged in
-  if (!token || !user) {
-    return <Navigate to="/login" replace />;
-  }
-
-  const role = getUserRole();
-
-  // ADMIN should use admin dashboard
-  if (role === "ADMIN") {
-    return <Navigate to="/admin" replace />;
-  }
-
-  return children;
-}
-
-// =====================================================
-// PUBLIC AUTH ROUTE
-// =====================================================
-
-function PublicRoute({ children }) {
-  const token = localStorage.getItem("token");
-  const user = getCurrentUser();
-
-  // User already logged in
-  if (token && user) {
-    const role = getUserRole();
-
-    if (role === "ADMIN") {
-      return <Navigate to="/admin" replace />;
-    }
-
-    return <Navigate to="/" replace />;
-  }
-
-  return children;
-}
-
-// =====================================================
-// 404 PAGE
-// =====================================================
-
 function NotFound() {
+  const navigate = useNavigate();
+
   return (
     <div className="not-found-page">
       <div className="not-found-content">
+        <div className="not-found-icon" aria-hidden="true">
+          ?
+        </div>
+
         <div className="not-found-number">404</div>
 
-        <h2>Page Not Found</h2>
+        <h1>Page Not Found</h1>
 
-        <p>The page you are looking for does not exist.</p>
+        <p>
+          The page you are looking for doesn't exist or may have been moved.
+        </p>
 
         <button
-          onClick={() => {
-            window.location.href = "/";
-          }}
+          type="button"
+          className="not-found-button"
+          onClick={() => navigate("/")}
         >
           Back to Home
         </button>
@@ -161,178 +66,166 @@ function NotFound() {
   );
 }
 
-// =====================================================
-// APP
-// =====================================================
+function AppContent() {
+  const { user, isAuthenticated, logout } = useAuth();
+
+  return (
+    <div className="app-shell">
+      <Navbar isAuthenticated={isAuthenticated} user={user} onLogout={logout} />
+
+      <main className="app-main">
+        <Routes>
+          {/* =========================
+              PUBLIC
+          ========================= */}
+
+          <Route path="/" element={<Home />} />
+
+          <Route path="/cards" element={<Cards />} />
+
+          <Route path="/cards/:id" element={<CardDetails />} />
+
+          <Route path="/compare" element={<CompareCards />} />
+
+          <Route path="/contact" element={<Contact />} />
+
+          {/* =========================
+              AUTH
+          ========================= */}
+
+          <Route
+            path="/login"
+            element={
+              <PublicRoute>
+                <Login />
+              </PublicRoute>
+            }
+          />
+
+          <Route
+            path="/register"
+            element={
+              <PublicRoute>
+                <Register />
+              </PublicRoute>
+            }
+          />
+
+          <Route
+            path="/forgot-password"
+            element={
+              <PublicRoute>
+                <ForgotPassword />
+              </PublicRoute>
+            }
+          />
+
+          {/* =========================
+              CUSTOMER
+          ========================= */}
+
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/applications"
+            element={
+              <ProtectedRoute>
+                <Applications />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/apply/:cardId"
+            element={
+              <ProtectedRoute>
+                <Apply />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* =========================
+              ADMIN
+          ========================= */}
+
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute adminOnly>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/cards"
+            element={
+              <ProtectedRoute adminOnly>
+                <AdminCards />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/applications"
+            element={
+              <ProtectedRoute adminOnly>
+                <AdminApplications />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/profile"
+            element={
+              <ProtectedRoute adminOnly>
+                <AdminProfile />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/contact"
+            element={
+              <ProtectedRoute adminOnly>
+                <AdminContact />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* =========================
+              404
+          ========================= */}
+
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </main>
+
+      <Footer />
+    </div>
+  );
+}
 
 function App() {
   return (
     <BrowserRouter>
-      {/* =================================================
-          ONE GLOBAL NAVBAR
-      ================================================= */}
-
-      <Navbar />
-
-      {/* =================================================
-          ROUTES
-      ================================================= */}
-
-      <Routes>
-        {/* =================================================
-            AUTH ROUTES
-        ================================================= */}
-
-        <Route
-          path="/login"
-          element={
-            <PublicRoute>
-              <Login />
-            </PublicRoute>
-          }
-        />
-
-        <Route
-          path="/register"
-          element={
-            <PublicRoute>
-              <Register />
-            </PublicRoute>
-          }
-        />
-
-        {/* =================================================
-            USER HOME
-        ================================================= */}
-
-        <Route
-          path="/"
-          element={
-            <UserRoute>
-              <Home />
-            </UserRoute>
-          }
-        />
-
-        {/* =================================================
-            CREDIT CARDS
-        ================================================= */}
-
-        <Route
-          path="/cards"
-          element={
-            <UserRoute>
-              <Cards />
-            </UserRoute>
-          }
-        />
-
-        {/* =================================================
-            USER APPLICATIONS
-        ================================================= */}
-
-        <Route
-          path="/applications"
-          element={
-            <UserRoute>
-              <Applications />
-            </UserRoute>
-          }
-        />
-
-        {/* =================================================
-            USER PROFILE
-        ================================================= */}
-
-        <Route
-          path="/profile"
-          element={
-            <UserRoute>
-              <Profile />
-            </UserRoute>
-          }
-        />
-
-        {/* =================================================
-            CONTACT
-        ================================================= */}
-
-        <Route
-          path="/contact"
-          element={
-            <UserRoute>
-              <Contact />
-            </UserRoute>
-          }
-        />
-
-        {/* =================================================
-            ADMIN DASHBOARD
-        ================================================= */}
-
-        <Route
-          path="/admin"
-          element={
-            <AdminRoute>
-              <AdminDashboard />
-            </AdminRoute>
-          }
-        />
-
-        {/* =================================================
-            ADMIN CARDS
-        ================================================= */}
-
-        <Route
-          path="/admin/cards"
-          element={
-            <AdminRoute>
-              <AdminCards />
-            </AdminRoute>
-          }
-        />
-
-        {/* =================================================
-            ADMIN APPLICATIONS
-        ================================================= */}
-
-        <Route
-          path="/admin/applications"
-          element={
-            <AdminRoute>
-              <AdminApplications />
-            </AdminRoute>
-          }
-        />
-
-        {/* =================================================
-            ADMIN PROFILE
-        ================================================= */}
-
-        <Route
-          path="/admin/profile"
-          element={
-            <AdminRoute>
-              <AdminProfile />
-            </AdminRoute>
-          }
-        />
-
-        <Route
-  path="/admin/contact"
-  element={
-    <AdminRoute>
-      <AdminContact />
-    </AdminRoute>
-  }
-/>
-
-        {/* =================================================
-            404
-        ================================================= */}
-
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+      <AppContent />
     </BrowserRouter>
   );
 }

@@ -1,7 +1,132 @@
-#root {
+@import "./styles/variables.css";
+
+/* =========================================================
+   CARDWISE — APP SHELL
+   ========================================================= */
+
+.app-shell {
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  color: var(--cw-text);
+  background: var(--cw-gradient-page), var(--cw-background);
 }
 
-main {
+.app-main {
+  flex: 1 0 auto;
   width: 100%;
+  min-width: 0;
+}
+
+/* =========================================================
+   404 PAGE
+   ========================================================= */
+
+.not-found-page {
+  min-height: calc(100vh - var(--cw-navbar-height));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 72px 20px;
+  background: var(--cw-gradient-page), var(--cw-background);
+}
+
+.not-found-content {
+  width: min(100%, 620px);
+  padding: 48px 32px;
+  text-align: center;
+}
+
+.not-found-icon {
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+  color: var(--cw-primary);
+  background: var(--cw-primary-light);
+  border: 1px solid var(--cw-border);
+  border-radius: 50%;
+  font-family: var(--cw-font-heading);
+  font-size: 2rem;
+  font-weight: var(--cw-weight-bold);
+}
+
+.not-found-number {
+  margin-bottom: 8px;
+  color: var(--cw-primary);
+  font-family: var(--cw-font-heading);
+  font-size: clamp(4rem, 12vw, 7rem);
+  font-weight: var(--cw-weight-extrabold);
+  line-height: 0.95;
+  letter-spacing: -0.06em;
+}
+
+.not-found-content h1 {
+  margin-bottom: 14px;
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+}
+
+.not-found-content p {
+  max-width: 480px;
+  margin: 0 auto 30px;
+  color: var(--cw-muted);
+  font-size: 1rem;
+}
+
+.not-found-button {
+  min-height: var(--cw-button-height);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 24px;
+  border: 0;
+  border-radius: var(--cw-radius-sm);
+  color: var(--cw-white);
+  background: var(--cw-gradient-brand);
+  box-shadow: var(--cw-shadow-blue);
+  font-weight: var(--cw-weight-bold);
+  transition:
+    transform var(--cw-duration-normal) var(--cw-ease),
+    box-shadow var(--cw-duration-normal) var(--cw-ease);
+}
+
+.not-found-button:hover {
+  transform: var(--cw-hover-lift);
+  box-shadow: var(--cw-shadow-lg);
+}
+
+.not-found-button:active {
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 650px) {
+  .not-found-page {
+    min-height: calc(100vh - 64px);
+    padding: 48px 16px;
+  }
+
+  .not-found-content {
+    padding: 32px 12px;
+  }
+
+  .not-found-icon {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 20px;
+    font-size: 1.65rem;
+  }
+
+  .not-found-content p {
+    font-size: 0.94rem;
+  }
+
+  .not-found-button {
+    width: 100%;
+  }
 }

@@ -4,7 +4,9 @@ import "./Home.css";
 function Home() {
   return (
     <div className="home-page">
-      {/* ================= HERO ================= */}
+      {/* =====================================================
+          HERO
+          ===================================================== */}
       <section className="home-hero">
         <div className="home-hero-content">
           <span className="home-badge">SMARTER CREDIT CARD CHOICES</span>
@@ -22,7 +24,7 @@ function Home() {
           <div className="home-actions">
             <Link to="/cards" className="home-primary-button">
               Explore Cards
-              <span>→</span>
+              <span aria-hidden="true">→</span>
             </Link>
 
             <Link to="/register" className="home-secondary-button">
@@ -48,18 +50,21 @@ function Home() {
           </div>
         </div>
 
-        {/* CREDIT CARD */}
+        {/* =================================================
+            CREDIT CARD VISUAL
+            ================================================= */}
         <div className="home-card-area">
-          <div className="home-card-glow"></div>
+          <div className="home-card-glow" aria-hidden="true" />
 
           <div className="home-credit-card">
             <div className="home-credit-card-header">
               <div className="home-card-bank">C</div>
+
               <span>CardWise</span>
             </div>
 
-            <div className="home-credit-card-chip">
-              <span></span>
+            <div className="home-credit-card-chip" aria-hidden="true">
+              <span />
             </div>
 
             <div className="home-credit-card-number">
@@ -93,7 +98,9 @@ function Home() {
         </div>
       </section>
 
-      {/* ================= WHY CARDWISE ================= */}
+      {/* =====================================================
+          WHY CARDWISE
+          ===================================================== */}
       <section className="home-features">
         <div className="home-section-heading">
           <span className="home-section-label">WHY CARDWISE</span>
@@ -107,9 +114,10 @@ function Home() {
         </div>
 
         <div className="home-feature-grid">
-          {/* COMPARE CARDS */}
           <article className="home-feature-card">
-            <div className="home-feature-icon">💳</div>
+            <div className="home-feature-icon" aria-hidden="true">
+              💳
+            </div>
 
             <h3>Compare Cards</h3>
 
@@ -122,9 +130,10 @@ function Home() {
             </Link>
           </article>
 
-          {/* BENEFITS */}
           <article className="home-feature-card">
-            <div className="home-feature-icon">💰</div>
+            <div className="home-feature-icon" aria-hidden="true">
+              💰
+            </div>
 
             <h3>Best Benefits</h3>
 
@@ -137,9 +146,10 @@ function Home() {
             </Link>
           </article>
 
-          {/* SECURE APPLICATION */}
           <article className="home-feature-card">
-            <div className="home-feature-icon">🔒</div>
+            <div className="home-feature-icon" aria-hidden="true">
+              🔒
+            </div>
 
             <h3>Secure Applications</h3>
 
@@ -155,7 +165,9 @@ function Home() {
         </div>
       </section>
 
-      {/* ================= BENEFITS ================= */}
+      {/* =====================================================
+          BENEFITS
+          ===================================================== */}
       <section className="home-benefits">
         <div className="home-section-heading">
           <span className="home-section-label">CARDWISE BENEFITS</span>
@@ -169,12 +181,13 @@ function Home() {
         </div>
 
         <div className="home-benefit-grid">
-          {/* FAST COMPARISON */}
           <Link
             to="/cards"
             className="home-benefit-card home-benefit-link-card"
           >
-            <div className="home-benefit-icon">⚡</div>
+            <div className="home-benefit-icon" aria-hidden="true">
+              ⚡
+            </div>
 
             <h3>Fast Comparison</h3>
 
@@ -183,12 +196,13 @@ function Home() {
             <span className="home-benefit-action">Compare Cards →</span>
           </Link>
 
-          {/* PREMIUM BENEFITS */}
           <Link
             to="/cards"
             className="home-benefit-card home-benefit-link-card"
           >
-            <div className="home-benefit-icon">💎</div>
+            <div className="home-benefit-icon" aria-hidden="true">
+              💎
+            </div>
 
             <h3>Premium Benefits</h3>
 
@@ -197,12 +211,13 @@ function Home() {
             <span className="home-benefit-action">Discover Benefits →</span>
           </Link>
 
-          {/* CLEAR INFORMATION */}
           <Link
             to="/cards"
             className="home-benefit-card home-benefit-link-card"
           >
-            <div className="home-benefit-icon">📊</div>
+            <div className="home-benefit-icon" aria-hidden="true">
+              📊
+            </div>
 
             <h3>Clear Information</h3>
 
@@ -211,12 +226,13 @@ function Home() {
             <span className="home-benefit-action">View Cards →</span>
           </Link>
 
-          {/* SECURE PLATFORM */}
           <Link
             to="/applications"
             className="home-benefit-card home-benefit-link-card"
           >
-            <div className="home-benefit-icon">🛡️</div>
+            <div className="home-benefit-icon" aria-hidden="true">
+              🛡️
+            </div>
 
             <h3>Secure Platform</h3>
 
@@ -227,7 +243,9 @@ function Home() {
         </div>
       </section>
 
-      {/* ================= CTA ================= */}
+      {/* =====================================================
+          CTA
+          ===================================================== */}
       <section className="home-cta">
         <div className="home-cta-container">
           <span className="home-section-label">READY TO START?</span>
@@ -240,51 +258,11 @@ function Home() {
           </p>
 
           <Link to="/cards" className="home-cta-button">
-            Explore Credit Cards →
+            Explore Credit Cards
+            <span aria-hidden="true">→</span>
           </Link>
         </div>
       </section>
-
-      {/* ================= FOOTER ================= */}
-      <footer className="home-footer">
-        <div className="home-footer-content">
-          <div className="home-footer-brand">
-            <Link to="/" className="home-footer-logo">
-              <span>C</span>
-              CardWise
-            </Link>
-
-            <p>
-              Find the right credit card for your lifestyle. Compare cards,
-              discover benefits and apply with confidence.
-            </p>
-          </div>
-
-          <div className="home-footer-column">
-            <h4>Quick Links</h4>
-
-            <Link to="/">Home</Link>
-
-            <Link to="/cards">Credit Cards</Link>
-
-            <Link to="/applications">Applications</Link>
-
-            <Link to="/contact">Contact</Link>
-          </div>
-
-          <div className="home-footer-column">
-            <h4>Account</h4>
-
-            <Link to="/login">Login</Link>
-
-            <Link to="/register">Create Account</Link>
-          </div>
-        </div>
-
-        <div className="home-footer-bottom">
-          © 2026 CardWise. All rights reserved.
-        </div>
-      </footer>
     </div>
   );
 }
