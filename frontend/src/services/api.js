@@ -2,10 +2,9 @@ import axios from "axios";
 
 const configuredApiUrl = import.meta.env.VITE_API_BASE_URL;
 
-const API_BASE_URL = (configuredApiUrl || "http://localhost:8080/api").replace(
-  /\/+$/,
-  "",
-);
+const API_BASE_URL = (
+  configuredApiUrl || "https://creditcardplatform.onrender.com/api"
+).replace(/\/+$/, "");
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -48,7 +47,7 @@ api.interceptors.response.use(
       requestUrl.includes("/auth/reset-password");
 
     // ==========================================================
-    // LOG ACTUAL SERVER RESPONSE
+    // LOG SERVER RESPONSE
     // ==========================================================
 
     if (status === 401) {
@@ -66,13 +65,15 @@ api.interceptors.response.use(
     }
 
     // ==========================================================
-    // ONLY CLEAR SESSION FOR REAL AUTHENTICATION FAILURE
+    // CLEAR SESSION FOR REAL AUTHENTICATION FAILURE
     // ==========================================================
 
     if (status === 401 && !isAuthRequest && !window.__cardwiseAuthHandling) {
       window.__cardwiseAuthHandling = true;
 
-      console.warn("CardWise authentication failed. Clearing local session.");
+      console.warn(
+        "CardWise authentication failed. Clearing local session.",
+      );
 
       const currentPath =
         window.location.pathname +
