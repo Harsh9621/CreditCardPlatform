@@ -1,5 +1,11 @@
 import React from "react";
-import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Route,
+  Routes,
+  useNavigate,
+  useLocation,
+} from "react-router-dom";
 
 import { useAuth } from "./context/AuthContext";
 
@@ -62,10 +68,24 @@ function NotFound() {
 
 function AppContent() {
   const { user, isAuthenticated, logout } = useAuth();
+  const location = useLocation();
+
+  // Hide Navbar and Footer on authentication pages
+  const isAuthPage =
+    location.pathname === "/login" ||
+    location.pathname === "/register" ||
+    location.pathname === "/forgot-password";
 
   return (
     <div className="app-shell">
-      <Navbar isAuthenticated={isAuthenticated} user={user} onLogout={logout} />
+      {/* Navbar hidden on Login/Register/Forgot Password */}
+      {!isAuthPage && (
+        <Navbar
+          isAuthenticated={isAuthenticated}
+          user={user}
+          onLogout={logout}
+        />
+      )}
 
       <main className="app-main">
         <Routes>
@@ -211,7 +231,8 @@ function AppContent() {
         </Routes>
       </main>
 
-      <Footer />
+      {/* Footer hidden on Login/Register/Forgot Password */}
+      {!isAuthPage && <Footer />}
     </div>
   );
 }
